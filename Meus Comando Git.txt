@@ -1,0 +1,287 @@
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git status
+On branch dev
+Your branch is up to date with 'origin/dev'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        modified:   Teste.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git add .
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git status
+On branch dev
+Your branch is up to date with 'origin/dev'.
+
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+        modified:   Teste.txt
+
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git commit -m "Mudança de regra"
+[dev 0b1feac] Mudança de regra
+ Committer: Tatilon Roberto Lino de Souza <4210@CEUMA.EDU.BR>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly:
+
+    git config --global user.name "Your Name"
+    git config --global user.email you@example.com
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git push
+Counting objects: 3, done.
+Writing objects: 100% (3/3), 284 bytes | 284.00 KiB/s, done.
+Total 3 (delta 0), reused 0 (delta 0)
+To https://github.com/TailonRoberto/Job.git
+   9fe18e5..0b1feac  dev -> dev
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ cat > .gitignore
+#Arquivo .ini
+*.ini
+
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ vim .git
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ vim .gitignore
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ vim .gitignore
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ vim .gitignore
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ vim .gitignore
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ vim Mais\ 1.txt
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ vim Teste.txt
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git status
+On branch dev
+Your branch is up to date with 'origin/dev'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        modified:   Teste.txt
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+        .gitignore
+        Mais 1.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git log
+commit 0b1feacc3c4095237d995588a6eac50193bdc043 (HEAD -> dev, origin/dev)
+Author: Tatilon Roberto Lino de Souza <4210@CEUMA.EDU.BR>
+Date:   Sun May 27 14:07:27 2018 -0300
+
+    Mudança de regra
+
+commit 9fe18e5dd5c847723d931b3371f02540c66b6097 (origin/master, master)
+Author: Tatilon Roberto Lino de Souza <4210@CEUMA.EDU.BR>
+Date:   Sun May 27 13:47:33 2018 -0300
+
+    Iniciando Projeto
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git log -p
+commit 0b1feacc3c4095237d995588a6eac50193bdc043 (HEAD -> dev, origin/dev)
+Author: Tatilon Roberto Lino de Souza <4210@CEUMA.EDU.BR>
+Date:   Sun May 27 14:07:27 2018 -0300
+
+    Mudança de regra
+
+diff --git a/Teste.txt b/Teste.txt
+index 27c5646..f6086a2 100644
+--- a/Teste.txt
++++ b/Teste.txt
+@@ -1 +1 @@
+-qualquer merda
+\ No newline at end of file
++Editando Job
+\ No newline at end of file
+
+commit 9fe18e5dd5c847723d931b3371f02540c66b6097 (origin/master, master)
+Author: Tatilon Roberto Lino de Souza <4210@CEUMA.EDU.BR>
+Date:   Sun May 27 13:47:33 2018 -0300
+
+    Iniciando Projeto
+
+diff --git a/Teste.txt b/Teste.txt
+new file mode 100644
+index 0000000..27c5646
+--- /dev/null
++++ b/Teste.txt
+@@ -0,0 +1 @@
++qualquer merda
+\ No newline at end of file
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git add .gitignore
+warning: LF will be replaced by CRLF in .gitignore.
+The file will have its original line endings in your working directory.
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git commit -am "Subindo arquivo .gitignore ma aplicação"
+warning: LF will be replaced by CRLF in Teste.txt.
+The file will have its original line endings in your working directory.
+[dev 5758955] Subindo arquivo .gitignore ma aplicação
+ Committer: Tatilon Roberto Lino de Souza <4210@CEUMA.EDU.BR>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly:
+
+    git config --global user.name "Your Name"
+    git config --global user.email you@example.com
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+ create mode 100644 .gitignore
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git push
+Counting objects: 4, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (2/2), done.
+Writing objects: 100% (4/4), 376 bytes | 376.00 KiB/s, done.
+Total 4 (delta 0), reused 0 (delta 0)
+To https://github.com/TailonRoberto/Job.git
+   0b1feac..5758955  dev -> dev
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git add Teste.
+Teste.ini  Teste.txt
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git add Teste.
+Teste.ini  Teste.txt
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git add Teste.
+Teste.ini  Teste.txt
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git add Teste.
+Teste.ini  Teste.txt
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git add Teste.ini
+The following paths are ignored by one of your .gitignore files:
+Teste.ini
+Use -f if you really want to add them.
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git add -f Teste.ini
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git commit - am "Subindo teste.ini"
+error: pathspec '-' did not match any file(s) known to git.
+error: pathspec 'am' did not match any file(s) known to git.
+error: pathspec 'Subindo teste.ini' did not match any file(s) known to git.
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git commit -am "Subindo teste.ini"
+[dev 8e17ee7] Subindo teste.ini
+ Committer: Tatilon Roberto Lino de Souza <4210@CEUMA.EDU.BR>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly:
+
+    git config --global user.name "Your Name"
+    git config --global user.email you@example.com
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 1 file changed, 1 insertion(+)
+ create mode 100644 Teste.ini
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git push
+Counting objects: 3, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (2/2), done.
+Writing objects: 100% (3/3), 346 bytes | 346.00 KiB/s, done.
+Total 3 (delta 0), reused 0 (delta 0)
+To https://github.com/TailonRoberto/Job.git
+   5758955..8e17ee7  dev -> dev
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ vim Teste.ini
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git add Mais\ 1.txt
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git commit
+[dev f16f45a] Subindo mais 1
+ Committer: Tatilon Roberto Lino de Souza <4210@CEUMA.EDU.BR>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly:
+
+    git config --global user.name "Your Name"
+    git config --global user.email you@example.com
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 Mais 1.txt
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git push
+Counting objects: 3, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (2/2), done.
+Writing objects: 100% (3/3), 362 bytes | 362.00 KiB/s, done.
+Total 3 (delta 0), reused 0 (delta 0)
+To https://github.com/TailonRoberto/Job.git
+   8e17ee7..f16f45a  dev -> dev
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git push origin dev:master
+Total 0 (delta 0), reused 0 (delta 0)
+To https://github.com/TailonRoberto/Job.git
+   9fe18e5..f16f45a  dev -> master
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
+$ git checkout master
+error: Your local changes to the following files would be overwritten by checkout:
+        Teste.ini
+Please commit your changes or stash them before you switch branches.
+Aborting
+
+4210@ma1-012600 MINGW64 /d/Git/Job (dev)
