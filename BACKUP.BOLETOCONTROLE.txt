@@ -1,0 +1,3109 @@
+Option Explicit
+
+
+Private bBancoGraduacao                 As Boolean
+Private bBoletoRegistrado               As Boolean
+Private bBancoTeste                     As Boolean
+
+Private Mensagem(1 To 12)                As String ' ANTES ERAM SO 9 POSIÇÕES COM O BOLETO GALILEO MAIS 3 LINHAS FORAM ADICIONADAS
+
+Public Function GerarCodigoBarraCodificado(ByVal CodigoBarras As String) As String
+    'Retorna o código já montado,
+    'bastando imprimir
+    Dim sCampo  As String
+    Dim llaco   As Long
+    
+    sCampo = "" '
+
+    For llaco = 1 To 44 Step 2
+        sCampo = sCampo & RetornarCaractereCodigoBarraASCII(Mid$(CodigoBarras, llaco, 2))
+    Next
+
+    GerarCodigoBarraCodificado = "{" & sCampo & "}"
+End Function
+
+Private Function RetornarCaractereCodigoBarraASCII(ByVal lBarra As String) As String
+    
+    Dim lascii(100) As String
+    
+    lascii(0) = "!"
+    lascii(1) = """"
+    lascii(2) = "#"
+    lascii(3) = "$"
+    lascii(4) = "%"
+    lascii(5) = "&"
+    lascii(6) = "'"
+    lascii(7) = "("
+    lascii(8) = ")"
+    lascii(9) = "*"
+    lascii(10) = "+"
+    lascii(11) = ","
+    lascii(12) = "-"
+    lascii(13) = "."
+    lascii(14) = "/"
+    lascii(15) = "0"
+    lascii(16) = "1"
+    lascii(17) = "2"
+    lascii(18) = "3"
+    lascii(19) = "4"
+    lascii(20) = "5"
+    lascii(21) = "6"
+    lascii(22) = "7"
+    lascii(23) = "8"
+    lascii(24) = "9"
+    lascii(25) = ":"
+    lascii(26) = ";"
+    lascii(27) = "<"
+    lascii(28) = "="
+    lascii(29) = ">"
+    lascii(30) = "?"
+    lascii(31) = "@"
+    lascii(32) = "A"
+    lascii(33) = "B"
+    lascii(34) = "C"
+    lascii(35) = "D"
+    lascii(36) = "E"
+    lascii(37) = "F"
+    lascii(38) = "G"
+    lascii(39) = "H"
+    lascii(40) = "I"
+    lascii(41) = "J"
+    lascii(42) = "K"
+    lascii(43) = "L"
+    lascii(44) = "M"
+    lascii(45) = "N"
+    lascii(46) = "O"
+    lascii(47) = "P"
+    lascii(48) = "Q"
+    lascii(49) = "R"
+    lascii(50) = "S"
+    lascii(51) = "T"
+    lascii(52) = "U"
+    lascii(53) = "V"
+    lascii(54) = "W"
+    lascii(55) = "X"
+    lascii(56) = "Y"
+    lascii(57) = "Z"
+    lascii(58) = "["
+    lascii(59) = "\"
+    lascii(60) = "]"
+    lascii(61) = "^"
+    lascii(62) = "_"
+    lascii(63) = "`"
+    lascii(64) = "a"
+    lascii(65) = "b"
+    lascii(66) = "c"
+    lascii(67) = "d"
+    lascii(68) = "e"
+    lascii(69) = "f"
+    lascii(70) = "g"
+    lascii(71) = "h"
+    lascii(72) = "i"
+    lascii(73) = "j"
+    lascii(74) = "k"
+    lascii(75) = "l"
+    lascii(76) = "m"
+    lascii(77) = "n"
+    lascii(78) = "o"
+    lascii(79) = "p"
+    lascii(80) = "q"
+    lascii(81) = "r"
+    lascii(82) = "s"
+    lascii(83) = "t"
+    lascii(84) = "u"
+    lascii(85) = "v"
+    lascii(86) = "w"
+    lascii(87) = "x"
+    lascii(88) = "y"
+    lascii(89) = "z"
+    lascii(90) = "¡"
+    lascii(91) = "¢"
+    lascii(92) = "£"
+    lascii(93) = "¤"
+    lascii(94) = "¥"
+    lascii(95) = "¦"
+    lascii(96) = "§"
+    lascii(97) = "¨"
+    lascii(98) = "©"
+    lascii(99) = "ª"
+    
+    RetornarCaractereCodigoBarraASCII = lascii(Val(lBarra))
+    
+End Function
+
+Private Sub MensagensMensalidade(ByVal Cpd As String, ByVal CodigoBoleta As String, ByVal AnoBoleta As String, _
+                                 ByVal Matricula As String, ByVal Vencimento As String)
+
+    If bBoletoReg Then
+        Call PG_Msg_Boleta_Reg400(CDbl(Cpd), Matricula, CInt(AnoBoleta), CodigoBoleta, Vencimento, G_Boleta_Aberto, "I")
+    Else
+        Call PG_Msg_Boleta(CDbl(Cpd), Matricula, CInt(AnoBoleta), CodigoBoleta, Vencimento, G_Boleta_Aberto, "I")
+    End If
+    
+'Solicitado via documento para retirar esse aviso
+    #If Euroam Then
+
+        If CodigoBoleta = "01" Then
+            'G_MsgBol(8) = "ESTE DOCUMENTO PERDE A VALIDADE EM " & Format(CDate(Vencimento) + 1, "DD/MM/YY")
+            'G_MsgBol(9) = "NAO RECEBER APOS " & Format(Vencimento, "DD/MM/YY")
+            G_MsgBol(9) = ""
+        End If
+
+    #End If
+
+    'Fim da inclusão em 17/01/2006
+    Mensagem(1) = G_MsgBol(1)
+    Mensagem(2) = G_MsgBol(2)
+    Mensagem(3) = G_MsgBol(3)
+    Mensagem(4) = G_MsgBol(4)
+    Mensagem(5) = G_MsgBol(5)
+    Mensagem(6) = G_MsgBol(6)
+    Mensagem(7) = G_MsgBol(7)
+    Mensagem(8) = G_MsgBol(8)
+    Mensagem(9) = G_MsgBol(9)
+    
+    #If Galileo Then
+       'MGS INSERIDAS NO BOLETO DO GALILEO
+       Mensagem(10) = G_MsgBol(10)
+       Mensagem(11) = G_MsgBol(11)
+       Mensagem(12) = G_MsgBol(12)
+   #End If
+End Sub
+Private Sub MensagensMensalidade_400(ByVal Cpd As String, ByVal CodigoBoleta As String, ByVal AnoBoleta As String, _
+                                 ByVal Matricula As String, ByVal Vencimento As String, ByVal DescontoReg As Currency)
+
+   
+    'Fim da inclusão em 17/01/2006
+    Mensagem(1) = ""
+    Mensagem(2) = ""
+    Mensagem(3) = ""
+    Mensagem(4) = ""
+    Mensagem(5) = ""
+    Mensagem(6) = ""
+    Mensagem(7) = ""
+    Mensagem(8) = ""
+    Mensagem(9) = ""
+    
+    #If Galileo Then
+       'MGS INSERIDAS NO BOLETO DO GALILEO
+       Mensagem(10) = ""
+       Mensagem(11) = ""
+       Mensagem(12) = ""
+   #End If
+  
+    If bBoletoReg Then
+        Call PG_Msg_Boleta_Mensalidade_400(Cpd, Matricula, CInt(AnoBoleta), CodigoBoleta, Vencimento, G_Boleta_Aberto, "I", , , DescontoReg)
+    End If
+    
+    
+   'Solicitado via documento para retirar esse aviso
+    #If Euroam Then
+        If CodigoBoleta = "01" Then
+            'G_MsgBol(8) = "ESTE DOCUMENTO PERDE A VALIDADE EM " & Format(CDate(Vencimento) + 1, "DD/MM/YY")
+            'G_MsgBol(9) = "NAO RECEBER APOS " & Format(Vencimento, "DD/MM/YY")
+            G_MsgBol(9) = ""
+        End If
+    #End If
+
+    'Fim da inclusão em 17/01/2006
+    Mensagem(1) = G_MsgBol(1)
+    Mensagem(2) = G_MsgBol(2)
+    Mensagem(3) = G_MsgBol(3)
+    Mensagem(4) = G_MsgBol(4)
+    Mensagem(5) = G_MsgBol(5)
+    Mensagem(6) = G_MsgBol(6)
+    Mensagem(7) = G_MsgBol(7)
+    Mensagem(8) = G_MsgBol(8)
+    Mensagem(9) = G_MsgBol(9)
+    
+    #If Galileo Then
+       'MGS INSERIDAS NO BOLETO DO GALILEO
+       Mensagem(10) = G_MsgBol(10)
+       Mensagem(11) = G_MsgBol(11)
+       Mensagem(12) = G_MsgBol(12)
+   #End If
+End Sub
+
+Public Property Let BancoGraduacao(ByVal Valor As Boolean)
+    bBancoGraduacao = Valor
+End Property
+
+Public Property Let TESTE(ByVal sValor As Boolean)
+    bBancoTeste = sValor
+End Property
+Public Property Let BoletoRegistrado(ByVal Valor As Boolean)
+    bBoletoRegistrado = Valor '--- vai ficar pra teste
+    bBoletoReg = Valor
+End Property
+
+#If Not Classes Then
+Public Function GerarBoletoServicoAvulso(ByVal Cpd As String, ByVal CodigoBoleto As String, ByVal AnoReferencia As String, _
+                                         ByVal Sacado As clsSacado, ByVal Sacador As clsSacador, ByVal ContaCorrente As clsContaCorrente, _
+                                         ByRef Mensagem() As String) As clsRetornoMetodo
+
+    Dim Vencimento                              As String
+    Dim valorTitulo                             As Currency
+    Dim nossoNumero                             As String
+
+    Dim BoletoSantander                         As clsBoletoSantander
+    Dim BoletoReal                              As clsBoletoReal
+
+    Dim CodigoBarrasCodificado                  As String
+
+    Dim sSql                                    As String
+
+    Dim rsConsulta                              As ADODB.Recordset
+    
+    Dim sPrefixoBanco                           As String
+    
+    Dim Estacao                                 As String
+    
+
+On Error GoTo Tratamento
+
+    
+
+    sPrefixoBanco = IIf(bBancoGraduacao, "PF", "EX")
+
+    sSql = ""
+    sSql = sSql & "SELECT   ISNULL(SUM(" & sPrefixoBanco & "D7VALSER), 0) AS VALORTITULO, "
+    sSql = sSql & "         CONVERT(VARCHAR, " & sPrefixoBanco & "D6DATVEN, 103) AS VENCIMENTO "
+    sSql = sSql & "FROM     " & sPrefixoBanco & "D6BOLSET INNER JOIN " & sPrefixoBanco & "D7BOLDIT "
+    sSql = sSql & "ON       FKD637CPDALU = FKD737CPDALU "
+    sSql = sSql & "         AND " & sPrefixoBanco & "D6CODBOL = FKD7D6CODBOL "
+    sSql = sSql & "         AND " & sPrefixoBanco & "D6ANOBOL = FKD7D6ANOBOL "
+    sSql = sSql & "WHERE    FKD637CPDALU = " & Cpd
+    sSql = sSql & "         AND " & sPrefixoBanco & "D6CODBOL = '" & CodigoBoleto & "' "
+    sSql = sSql & "         AND " & sPrefixoBanco & "D6ANOBOL = " & AnoReferencia & " "
+    sSql = sSql & "GROUP BY " & sPrefixoBanco & "D6DATVEN"
+
+    If bBancoGraduacao Then
+        Set rsConsulta = G_CONEXAO_ADO.Execute(sSql)
+    Else
+        Set rsConsulta = G_CONEXAO_EXT.Execute(sSql)
+    End If
+
+    If rsConsulta.EOF Then
+        Set GerarBoletoServicoAvulso = New clsRetornoMetodo
+        With GerarBoletoServicoAvulso
+            .CodigoErro = 0
+            .Descricao = "Não foi possível localizar dados!"
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        Exit Function
+    End If
+    
+    valorTitulo = Trim$(rsConsulta("VALORTITULO"))
+    
+    
+    Vencimento = Trim$(rsConsulta("VENCIMENTO"))
+
+    nossoNumero = FG_GeraNossoNumero(CodigoBoleto, AnoReferencia, Cpd, eBoletoServico)
+
+    nossoNumero = FG_GeraNossoNumero_400(nossoNumero, Cpd, eBoletoServico, Vencimento, AnoReferencia, CodigoBoleto)
+        
+    Select Case ContaCorrente.Banco.CodigoBanco
+        Case "356"
+            Set BoletoReal = New clsBoletoReal
+            Set GerarBoletoServicoAvulso = BoletoReal.ObterBoleto(ContaCorrente.Banco.CodigoBanco, ContaCorrente.agencia, _
+                                                                  ContaCorrente.Cedente, ContaCorrente.ContaCorrente, "9", _
+                                                                  Vencimento, valorTitulo, nossoNumero, "102", _
+                                                                  Mensagem(), Sacado, Sacador)
+
+        Case "033"
+            Set BoletoSantander = New clsBoletoSantander
+            If bBoletoReg Then
+            
+                Set GerarBoletoServicoAvulso = BoletoSantander.ObterBoleto(ContaCorrente.Banco.CodigoBanco, ContaCorrente.agencia, _
+                                                                       ContaCorrente.Cedente, ContaCorrente.ContaCorrente, Estacao, "9", _
+                                                                       Vencimento, valorTitulo, nossoNumero, "101", _
+                                                                       Mensagem(), Sacado, Sacador)
+            Else
+            
+                Set GerarBoletoServicoAvulso = BoletoSantander.ObterBoleto(ContaCorrente.Banco.CodigoBanco, ContaCorrente.agencia, _
+                                                                       ContaCorrente.Cedente, ContaCorrente.ContaCorrente, Estacao, "9", _
+                                                                       Vencimento, valorTitulo, nossoNumero, "102", _
+                                                                       Mensagem(), Sacado, Sacador)
+            End If
+    End Select
+
+    GerarBoletoServicoAvulso.ValorRetorno.CodigoBarrasCodificado = GerarCodigoBarraCodificado(GerarBoletoServicoAvulso.ValorRetorno.CodigoBarras)
+
+    Exit Function
+Tratamento:
+    Set GerarBoletoServicoAvulso = New clsRetornoMetodo
+    With GerarBoletoServicoAvulso
+        .CodigoErro = Err.Number
+        .Descricao = Err.Description
+        .Retorno = False
+        Set .ValorRetorno = Nothing
+    End With
+End Function
+#End If
+
+Public Function GerarBoletoServicoAvulsoReg(ByVal Cpd As String, ByVal CodigoBoleto As String, ByVal AnoReferencia As String) As clsRetornoMetodo
+
+    
+    Dim AlunoFinanceiro                         As clsAlunoFinanceiro
+    Dim RetornoMetodo                           As clsRetornoMetodo
+    
+    Dim ControleAluno                           As clsAlunoFinanceiroControle
+    Dim CLASSEBOLETO                            As clsBoleto
+    Dim nossoNumero                             As String
+    Dim BoletoReal                              As clsBoletoReal
+    Dim sSql                                    As String
+    Dim rsConsulta                              As ADODB.Recordset
+    Dim sPrefixoBanco                           As String
+    Dim BoletoSantander                         As clsBoletoSantander
+    
+    
+    
+    Dim Sacado                                  As clsSacado
+    Dim Sacador                                 As clsSacador
+    
+   
+    Dim agencia                                 As String
+    Dim CodigoCedente                           As String
+    Dim ComplemententoConta                     As String
+    Dim Banco                                   As String
+    Dim Estacao                                 As String
+    Dim Vencimento                              As String
+    Dim NomeCedente                             As String
+    Dim DetetiveT                               As String
+    
+    
+    Dim sBanco                                  As String
+    
+    Dim CodigoBarrasCodificado                  As String
+    Dim valorTitulo                             As Currency
+    
+    
+    
+    Gb_Graduacao = bBancoGraduacao
+    On Error GoTo Tratamento
+    sPrefixoBanco = IIf(bBancoGraduacao, "PF", "EX")
+   
+    
+    #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+        Call Abrir_Conexao(bBancoTeste)
+    #End If
+    
+
+    sSql = ""
+    sSql = sSql & "SELECT   ISNULL(SUM(" & sPrefixoBanco & "D7VALSER), 0) AS VALORTITULO, "
+    sSql = sSql & "         CONVERT(VARCHAR, " & sPrefixoBanco & "D6DATVEN, 103) AS VENCIMENTO "
+    sSql = sSql & "FROM     " & sPrefixoBanco & "D6BOLSET INNER JOIN " & sPrefixoBanco & "D7BOLDIT "
+    sSql = sSql & "ON       FKD637CPDALU = FKD737CPDALU "
+    sSql = sSql & "         AND " & sPrefixoBanco & "D6CODBOL = FKD7D6CODBOL "
+    sSql = sSql & "         AND " & sPrefixoBanco & "D6ANOBOL = FKD7D6ANOBOL "
+    sSql = sSql & "WHERE    FKD637CPDALU = " & Cpd
+    sSql = sSql & "         AND " & sPrefixoBanco & "D6CODBOL = '" & CodigoBoleto & "' "
+    sSql = sSql & "         AND " & sPrefixoBanco & "D6ANOBOL = " & AnoReferencia & " "
+    sSql = sSql & "GROUP BY " & sPrefixoBanco & "D6DATVEN"
+
+
+    If bBancoGraduacao Then
+         Set rsConsulta = G_CONEXAO_ADO.Execute(sSql)
+    Else
+        Set rsConsulta = G_CONEXAO_EXT.Execute(sSql)
+    End If
+    
+   
+
+    If rsConsulta.EOF Then
+        Set GerarBoletoServicoAvulsoReg = New clsRetornoMetodo
+        With GerarBoletoServicoAvulsoReg
+            .CodigoErro = 0
+            .Descricao = "Não foi possível localizar dados!"
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        Exit Function
+    End If
+
+    
+    Set ControleAluno = New clsAlunoFinanceiroControle
+   
+    ControleAluno.BancoGraduacao = Gb_Graduacao
+  
+    Set RetornoMetodo = ControleAluno.BuscarDadosAluno(Cpd)
+
+    If Not RetornoMetodo.Retorno Then
+    
+        Set GerarBoletoServicoAvulsoReg = RetornoMetodo
+        DetetiveT = "13"
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+   
+    Set AlunoFinanceiro = RetornoMetodo.ValorRetorno
+   
+    Set ControleAluno = Nothing
+
+    Call PG_BuscarContaCompensacaoBoletoRegistrado_Aluno(Cpd, agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente, "", Estacao)
+   
+    If Trim$(agencia) = "" Or Trim$(CodigoCedente) = "" Or Trim$(ComplemententoConta) = "" Then
+        Set GerarBoletoServicoAvulsoReg = New clsRetornoMetodo
+        With GerarBoletoServicoAvulsoReg
+            .CodigoErro = 0
+            .Descricao = "Faltam informações da conta."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+       
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+
+    
+   ' ------------------------------ tem no mensalidade mas nao tem aki -- teste 22122017
+'    Set ClasseBoleto = New clsBoleto
+'    ClasseBoleto.gbGraduacao = bBancoGraduacao
+'    Call ClasseBoleto.ValorBoleta(Cpd, CInt(AnoReferencia), CodigoBoleto, FG_Data_Sistema("DD/MM/YYYY"), "B")
+'    '------------------------------
+    
+    
+    valorTitulo = Trim$(rsConsulta("VALORTITULO"))
+    
+     If valorTitulo <= 0 Then
+        Set GerarBoletoServicoAvulsoReg = New clsRetornoMetodo
+        With GerarBoletoServicoAvulsoReg
+            .CodigoErro = 0
+            .Descricao = "Valor do título precisa ser maior que zero"
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        Exit Function
+    End If
+    
+    Vencimento = Trim$(rsConsulta("VENCIMENTO"))
+ 
+    nossoNumero = FG_GeraNossoNumero(CodigoBoleto, AnoReferencia, Cpd, eBoletoServico)
+    nossoNumero = FG_GeraNossoNumero_400(nossoNumero, Cpd, eBoletoServico, Vencimento, AnoReferencia, CodigoBoleto, CStr(valorTitulo))
+  
+    
+    '----------------------------------------------- Controlador ---
+    If NOssoNumeronaTB09(nossoNumero) Then
+      Set BoletoSantander = New clsBoletoSantander
+      Set GerarBoletoServicoAvulsoReg = BoletoSantander.ObterBoleto_T9(nossoNumero)
+      Exit Function
+    Else
+      If CDate(Vencimento) < CDate(FG_Data_Sistema) Then
+          Set GerarBoletoServicoAvulsoReg = New clsRetornoMetodo
+          With GerarBoletoServicoAvulsoReg
+              .CodigoErro = 0
+              .Descricao = "Vencimento Inválido: " & Vencimento
+              .Retorno = False
+              Set .ValorRetorno = Nothing
+          End With
+          Call AlertaErro("Financeiro", "GerarBoletoServicoAvulsoReg" & "Vencimento Inválido" & Vencimento & " - Boleto Servico" & "- CPD " & Cpd & "NossoNumero:" & nossoNumero)
+         Exit Function
+      End If
+    End If
+   '---------------------------------------------
+    
+    
+    Mensagem(1) = "Boleto de Servico Avulso"
+    Mensagem(2) = ""
+    Mensagem(3) = ""
+    Mensagem(4) = ""
+    Mensagem(5) = ""
+    Mensagem(6) = ""
+    Mensagem(7) = ""
+    Mensagem(9) = ""
+       
+  
+    Set Sacado = New clsSacado
+    With Sacado
+        .Bairro = AlunoFinanceiro.Bairro
+        .CEP = AlunoFinanceiro.CEP
+        .CPFCnpj = AlunoFinanceiro.cpf
+        .Endereco = AlunoFinanceiro.Endereco
+        .NOME = AlunoFinanceiro.NOME
+        .UnidadeFederativa = AlunoFinanceiro.UnidadeFederativa
+        .Cidade = AlunoFinanceiro.Cidade
+    End With
+
+    Set Sacador = New clsSacador
+    With Sacador
+        .NOME = AlunoFinanceiro.Contratante.NOME
+        .CPFCnpj = AlunoFinanceiro.Contratante.cpf
+    End With
+
+    Set BoletoSantander = New clsBoletoSantander
+
+    Set GerarBoletoServicoAvulsoReg = BoletoSantander.ObterBoleto(Banco, agencia, _
+                                                                NomeCedente, CodigoCedente, Estacao, "9", _
+                                                                Vencimento, valorTitulo, nossoNumero, "101", _
+                                                                Mensagem(), Sacado, Sacador)
+
+
+
+    GerarBoletoServicoAvulsoReg.ValorRetorno.CodigoBarrasCodificado = GerarCodigoBarraCodificado(GerarBoletoServicoAvulsoReg.ValorRetorno.CodigoBarras)
+
+
+
+    Exit Function
+    
+Tratamento:
+  
+    Set GerarBoletoServicoAvulsoReg = New clsRetornoMetodo
+    With GerarBoletoServicoAvulsoReg
+        .CodigoErro = Err.Number
+        .Descricao = Err.Description & DetetiveT
+        .Retorno = True
+        Set .ValorRetorno = Nothing
+    End With
+    Call AlertaErro("Financeiro", "GerarBoletoServicoAvulso" & "Cpd: " & Cpd & "NossoNumero " & nossoNumero)
+End Function
+
+'Public Function GerarBoletoServico(ByVal Cpd As String, ByVal CodigoBoleto As String, _
+                                    ByVal AnoReferencia As String) As clsRetornoMetodo
+Public Function GerarBoletoServico(ByVal Cpd As String, ByVal CodigoBoleto As String, _
+                                    ByVal AnoReferencia As String) As clsRetornoMetodo
+                                    
+    
+
+    Dim AlunoFinanceiro                         As clsAlunoFinanceiro
+    Dim RetornoMetodo                           As clsRetornoMetodo
+    
+    Dim ControleAluno                           As clsAlunoFinanceiroControle
+    
+    Dim Vencimento                              As String
+    Dim valorTitulo                             As Currency
+    Dim nossoNumero                             As String
+    
+    Dim BoletoSantander                         As clsBoletoSantander
+    Dim BoletoReal                              As clsBoletoReal
+    
+    Dim CodigoBarrasCodificado                  As String
+    
+    Dim sSql                                    As String
+    Dim agencia                                 As String
+    Dim CodigoCedente                           As String
+    Dim ComplemententoConta                     As String
+    Dim Banco                                   As String
+    Dim Estacao                                 As String
+    Dim NomeCedente                             As String
+    Dim sBanco                                  As String
+    
+    Dim rsConsulta                              As ADODB.Recordset
+    
+    Dim Sacado                                  As clsSacado
+    Dim Sacador                                 As clsSacador
+    
+On Error GoTo Tratamento
+    
+    Gb_Graduacao = bBancoGraduacao
+    
+    If bBancoGraduacao Then
+        sBanco = "PF"
+    Else
+        sBanco = "EX"
+    End If
+    
+    #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+        Call Abrir_Conexao(bBancoTeste)
+    #End If
+    
+    
+    sSql = ""
+    sSql = sSql & "SELECT   " & sBanco & "D6VALBAS AS VALOR," & sBanco & "D6DATVEN AS VENCIMENTO "
+    sSql = sSql & "FROM     " & sBanco & "D6BOLSET "
+    sSql = sSql & "WHERE    1 = 1 "
+    sSql = sSql & "     AND FKD637CPDALU = " & Cpd & " "
+    sSql = sSql & "     AND " & sBanco & "D6CODBOL = '" & CodigoBoleto & "' "
+    sSql = sSql & "     AND " & sBanco & "D6ANOBOL = " & AnoReferencia
+    
+    If bBancoGraduacao Then
+        Set rsConsulta = G_CONEXAO_ADO.Execute(sSql)
+    Else
+        Set rsConsulta = G_CONEXAO_EXT.Execute(sSql)
+    End If
+    
+    If rsConsulta.EOF Then
+        Set GerarBoletoServico = New clsRetornoMetodo
+        With GerarBoletoServico
+            .CodigoErro = 0
+            .Descricao = "Não foi possível localizar dados!" & sSql & "-"
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        Exit Function
+    End If
+    
+    
+    Set ControleAluno = New clsAlunoFinanceiroControle
+    
+    ControleAluno.BancoGraduacao = bBancoGraduacao
+    
+    Set RetornoMetodo = ControleAluno.BuscarDadosAluno(Cpd)
+    
+    If Not RetornoMetodo.Retorno Then
+        Set GerarBoletoServico = RetornoMetodo
+        
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+    
+    Set AlunoFinanceiro = RetornoMetodo.ValorRetorno
+    
+    Set ControleAluno = Nothing
+    bBoletoReg = True
+    
+    If bBoletoReg Then
+       Call PG_BuscarContaCompensacaoBoletoRegistrado_Aluno(Cpd, agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente, "", Estacao)
+    Else
+       Call PG_BuscarContaCompensacaoBoleto_Aluno(Cpd, agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente)
+    End If
+    
+    valorTitulo = Trim$(rsConsulta("VALOR"))
+    
+    If valorTitulo <= 0 Then
+        Set GerarBoletoServico = New clsRetornoMetodo
+        With GerarBoletoServico
+            .CodigoErro = 0
+            .Descricao = "Valor do título precisa ser maior que zero"
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        Exit Function
+    End If
+    
+    Vencimento = Trim$(rsConsulta("VENCIMENTO"))
+    nossoNumero = FG_GeraNossoNumero(CodigoBoleto, AnoReferencia, Cpd, eBoletoServico)
+    nossoNumero = FG_GeraNossoNumero_400(nossoNumero, Cpd, eBoletoServico, Vencimento, AnoReferencia, CodigoBoleto, CStr(valorTitulo))
+  
+    If NOssoNumeronaTB09(nossoNumero) Then
+      Set BoletoSantander = New clsBoletoSantander
+      Set GerarBoletoServico = BoletoSantander.ObterBoleto_T9(nossoNumero)
+      Exit Function
+    Else
+      If CDate(Vencimento) < CDate(FG_Data_Sistema) Then
+          Set GerarBoletoServico = New clsRetornoMetodo
+          With GerarBoletoServico
+              .CodigoErro = 0
+              .Descricao = "Vencimento Inválido: " & Vencimento
+              .Retorno = False
+              Set .ValorRetorno = Nothing
+          End With
+          Call AlertaErro("Financeiro", "GerarBoletoServico" & "Vencimento Inválido" & Vencimento & " - Boleto Servico" & "- CPD " & Cpd & "NossoNumero:" & nossoNumero)
+         Exit Function
+      End If
+    End If
+    
+    Set Sacado = New clsSacado
+    
+    With Sacado
+        .Bairro = AlunoFinanceiro.Bairro
+        .CEP = AlunoFinanceiro.CEP
+        .CPFCnpj = AlunoFinanceiro.cpf
+        .Endereco = AlunoFinanceiro.Endereco
+        .NOME = AlunoFinanceiro.NOME
+        .UnidadeFederativa = AlunoFinanceiro.UnidadeFederativa
+        .Cidade = AlunoFinanceiro.Cidade
+    End With
+    
+    Set Sacador = New clsSacador
+    
+    With Sacador
+        .NOME = AlunoFinanceiro.Contratante.NOME
+        .CPFCnpj = AlunoFinanceiro.Contratante.cpf
+    End With
+    
+    Mensagem(1) = "Não receber após o vencimento."
+    'Mensagem(2) = mg
+    
+    Select Case Banco
+        Case "356"
+            Set BoletoReal = New clsBoletoReal
+            Set GerarBoletoServico = BoletoReal.ObterBoleto(Banco, agencia, _
+                                                                  NomeCedente, CodigoCedente, "9", _
+                                                                  Vencimento, valorTitulo, nossoNumero, "102", _
+                                                                  Mensagem(), Sacado, Sacador)
+            
+        Case "033"
+            Set BoletoSantander = New clsBoletoSantander
+            If bBoletoReg Then
+            
+            Set GerarBoletoServico = BoletoSantander.ObterBoleto(Banco, agencia, NomeCedente, CodigoCedente, Estacao, "9", _
+                                                                Vencimento, valorTitulo, nossoNumero, "101", _
+                                                              Mensagem(), Sacado, Sacador)
+            
+            Else
+            
+            Set GerarBoletoServico = BoletoSantander.ObterBoleto(Banco, agencia, NomeCedente, CodigoCedente, Estacao, "9", _
+                                                                Vencimento, valorTitulo, nossoNumero, "102", _
+                                                              Mensagem(), Sacado, Sacador)
+            End If
+    End Select
+
+                                                        
+    GerarBoletoServico.ValorRetorno.CodigoBarrasCodificado = GerarCodigoBarraCodificado(GerarBoletoServico.ValorRetorno.CodigoBarras)
+    
+    GerarBoletoServico.ValorRetorno.MensagemPersonalizada = FL_RetornaListaDeServiços(Cpd, CodigoBoleto, AnoReferencia)
+    
+    Exit Function
+Tratamento:
+    Set GerarBoletoServico = New clsRetornoMetodo
+    With GerarBoletoServico
+        .CodigoErro = Err.Number
+        .Descricao = Err.Description
+        .Retorno = False
+        Set .ValorRetorno = Nothing
+    End With
+End Function
+
+Private Function FL_RetornaListaDeServiços(ByVal sCpd As String, ByVal sCodBol As String, ByVal sAnobol As String) As String
+    'Retorna a lista de serviço gerados por protocolos pagos
+    
+    Dim sSql    As String
+    Dim Rs      As ADODB.Recordset
+    Dim sLista  As String
+    Dim sBanco  As String
+    
+    sLista = ""
+    sSql = ""
+    FL_RetornaListaDeServiços = ""
+    
+    If Gb_Graduacao Then
+        sBanco = "PF"
+    Else
+        sBanco = "EX"
+    End If
+    
+    
+    'procura o protocolo ligado àquele boleto
+    sSql = sSql & " Select FKD652CODPRO as CodPro, FKD652ANOPRO as AnoPro, " & sBanco & "50CODSER as CodSer, " & sBanco & "50DESSER as Servico"
+    sSql = sSql & " From " & sBanco & "D6BOLSET, " & sBanco & "52PROTOT, " & sBanco & "50SEREMT"
+    sSql = sSql & " Where 1 = 1"
+    sSql = sSql & "     and FKD637CPDALU =  " & sCpd
+    sSql = sSql & "     and " & sBanco & "D6CODBOL   = '" & sCodBol & "'"
+    sSql = sSql & "     and " & sBanco & "D6ANOBOL   =  " & sAnobol
+    sSql = sSql & "     and FKD652CODPRO = " & sBanco & "52CODPRO"
+    sSql = sSql & "     and FKD652ANOPRO = " & sBanco & "52ANOPRO"
+    sSql = sSql & "     and FK5250CODSER = " & sBanco & "50CODSER"
+    
+    
+    Set Rs = Nothing
+'    If Gb_Graduacao Then
+        Set Rs = G_CONEXAO_ADO.Execute(sSql)
+'    Else
+'        Set Rs = G_CONEXAO_EXT.Execute(sSql)
+'    End If
+    
+    If Not Rs.EOF Then
+    
+        sLista = "Protocolo: " & Trim("" & Rs!CodPro) & "/" & Trim("" & Rs!AnoPro) & " - " & Trim("" & Rs!CodSer) & "." & Trim("" & Rs!Servico)
+    
+        'Procura as disciplinas, caso haja, de protocolo de dependencia/adaptacao
+        sSql = ""
+        sSql = sSql & " Select " & sBanco & "11CODDIS as CodDis, " & sBanco & "11DESDIS as DesDis"
+        sSql = sSql & " From " & sBanco & "D6BOLSET, " & sBanco & "71DISCPR, " & sBanco & "11DISCIT"
+        sSql = sSql & " Where 1 = 1"
+        sSql = sSql & "     and FKD652CODPRO = '" & Trim("" & Rs!CodPro) & "'"
+        sSql = sSql & "     and FKD652ANOPRO =  " & Trim("" & Rs!AnoPro)
+        sSql = sSql & "     and FKD652CODPRO = FK7152CODPRO"
+        sSql = sSql & "     and FKD652ANOPRO = FK7152ANOPRO"
+        sSql = sSql & "     and FK7111CODDIS = " & sBanco & "11CODDIS"
+    
+        Set Rs = Nothing
+        
+'        If Gb_Graduacao Then
+            Set Rs = G_CONEXAO_ADO.Execute(sSql)
+'        Else
+'            Set Rs = G_CONEXAO_EXT.Execute(sSql)
+'        End If
+        
+        If Not Rs.EOF Then
+            sLista = sLista & vbCrLf & "Disciplinas: " & vbCrLf
+        End If
+        
+        Do While Not Rs.EOF
+            sLista = sLista & "   " & Trim("" & Rs!CodDis) & "-" & Trim("" & Rs!DesDis)
+            Rs.MoveNext
+            If Not Rs.EOF Then
+                sLista = sLista & vbCrLf ' avança linha
+            End If
+        Loop
+        
+        FL_RetornaListaDeServiços = Trim(sLista)
+        
+    End If
+    
+End Function
+
+Public Function GerarBoletoInscricaoPosGraduacao(ByVal Inscricao As String) As clsRetornoMetodo
+        
+    Dim nossoNumero                             As String
+    
+    Dim agencia                                 As String
+    Dim CodigoCedente                           As String
+    Dim ComplemententoConta                     As String
+    Dim Banco                                   As String
+    Dim Estacao                                 As String
+    Dim Vencimento                              As String
+    Dim NomeCedente                             As String
+    
+    Dim BoletoSantander                         As clsBoletoSantander
+    Dim BoletoSantanderT9                       As clsBoletoSantander
+    Dim BoletoReal                              As clsBoletoReal
+    Dim Sacado                                  As clsSacado
+    Dim Sacador                                 As clsSacador
+    
+    Dim CodigoBarrasCodificado                  As String
+    
+    Dim valorTitulo                             As Currency
+    
+    Dim sSql                                    As String
+    
+    Dim rsConsulta                              As ADODB.Recordset
+    
+On Error GoTo Tratamento
+
+    #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+        Call Abrir_Conexao(bBancoTeste)
+    #End If
+    
+    Gb_Graduacao = bBancoGraduacao
+    
+    'Buscar informações da pré inscrição
+    sSql = ""
+    sSql = sSql & "SELECT  EX57NUMINS  AS INSCRICAO,   EX57NOMEAL  AS NOME, "
+    sSql = sSql & "        EX57ENDERE  AS ENDERECO,    EX57BAIRRO  AS BAIRRO, "
+    sSql = sSql & "        EX57CIDADE  AS CIDADE,      EX57NUMCEP  AS CEP, "
+    sSql = sSql & "        EX57UNIFED  AS UF,          EX57NUMCPF  AS CPF, "
+    sSql = sSql & "        EX12CODBOL  AS MBCODBOL,    EX12DATVEN  AS MBDATVEN, "
+    sSql = sSql & "        EX12ANOBOL  AS MBANOBOL,    EX12SITBOL  AS MBSITBOL, "
+    sSql = sSql & "        EX12VALBAS  AS VALBAS,      EX12DATPAG  AS MBDATPAG "
+    sSql = sSql & "FROM    EX12BOLINT, EX57PRINST "
+    sSql = sSql & "WHERE   1=1 "
+    sSql = sSql & "        AND EX57NUMINS      = " & Inscricao
+    sSql = sSql & "        AND FK1257NUMINS    = EX57NUMINS "
+    
+    Set rsConsulta = G_CONEXAO_EXT.Execute(sSql)
+    
+    If rsConsulta.EOF Then
+        Set GerarBoletoInscricaoPosGraduacao = New clsRetornoMetodo
+        With GerarBoletoInscricaoPosGraduacao
+            .CodigoErro = 0
+            .Descricao = "Não possível localizar dados da inscrição."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+       
+    If bBoletoReg Then
+        Call PG_BuscarContaCompensacaoBoleto_Inscricao_Reg(Inscricao, agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente, "", Estacao)
+       'Call PG_BuscarContaCompensacaoBoletoRegistrado_Aluno(Inscricao, Agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente, "", Estacao)
+    Else
+       Call PG_BuscarContaCompensacaoBoleto_Inscricao(Inscricao, agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente)
+    End If
+   ' Call PG_BuscarContaCompensacaoBoleto_Inscricao(Inscricao, Agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente)
+    
+    If Trim$(agencia) = "" Or Trim$(CodigoCedente) = "" Or Trim$(ComplemententoConta) = "" Then
+        Set GerarBoletoInscricaoPosGraduacao = New clsRetornoMetodo
+        With GerarBoletoInscricaoPosGraduacao
+            .CodigoErro = 0
+            .Descricao = "Faltam informações da conta."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+   
+        
+        Exit Function
+    End If
+    
+    valorTitulo = CCur("0" & rsConsulta("VALBAS"))
+      
+    If valorTitulo <= 0 Then
+        Set GerarBoletoInscricaoPosGraduacao = New clsRetornoMetodo
+        
+        With GerarBoletoInscricaoPosGraduacao
+            .CodigoErro = 0
+            .Descricao = "Valor do título precisa ser maior que zero."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+    
+    Vencimento = Format$(rsConsulta("MBDATVEN"), GC_FORMATO_DATA)
+  
+    
+    If valorTitulo <= 0 Then
+       Set GerarBoletoInscricaoPosGraduacao = New clsRetornoMetodo
+        With GerarBoletoInscricaoPosGraduacao
+            .CodigoErro = Err.Number
+            .Descricao = "Valor do título precisa ser maior que zero."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+       Call AlertaErro("Financeiro", "GerarBoletoInscricaoPosGraduacao" & "Valor Inválido: " & valorTitulo & " - Inscricao: " & Inscricao)
+       Exit Function
+    End If
+    
+    Gb_Graduacao = bBancoGraduacao
+    nossoNumero = FG_GeraNossoNumero(rsConsulta("MBCODBOL"), rsConsulta("MBANOBOL"), Inscricao, eBoletoPreInscricaoPos)
+    nossoNumero = FG_GeraNossoNumero_400(nossoNumero, Format$(Inscricao, "0000000"), eBoletoPreInscricaoPos, Vencimento, rsConsulta("MBANOBOL"), rsConsulta("MBCODBOL"), rsConsulta("VALBAS"))
+    
+    
+   '----------------------------------------------- Controlador ---
+    Gb_Graduacao = bBancoGraduacao
+    If NOssoNumeronaTB09(nossoNumero) Then
+      Set BoletoSantander = New clsBoletoSantander
+      Set GerarBoletoInscricaoPosGraduacao = BoletoSantander.ObterBoleto_T9(nossoNumero)
+      Exit Function
+    Else
+      If CDate(Vencimento) < CDate(FG_Data_Sistema) Then
+         Set GerarBoletoInscricaoPosGraduacao = New clsRetornoMetodo
+          With GerarBoletoInscricaoPosGraduacao
+              .CodigoErro = 0
+              .Descricao = "Vencimento Inválido: " & Vencimento
+              .Retorno = False
+              Set .ValorRetorno = Nothing
+          End With
+          Call AlertaErro("Financeiro", "GerarBoletoInscricaoPosGraduação" & "Vencimento Inválido: " & Vencimento & "- Inscricao " & Inscricao)
+         Exit Function
+      End If
+    End If
+   '---------------------------------------------
+    
+    
+    
+    Mensagem(1) = "Inscrição:" + Format$(Inscricao, "000000")
+    Mensagem(2) = "Veja seus cursos na área de acompanhamento."
+    Mensagem(3) = ""
+    Mensagem(4) = "NÃO RECEBER APÓS O VENCIMENTO"
+    Mensagem(5) = "O simples pagamento não caracteriza matricula."
+    Mensagem(6) = ""
+    Mensagem(7) = ""
+    Mensagem(8) = ""
+    Mensagem(9) = ""
+    
+    Set Sacado = New clsSacado
+    
+    With Sacado
+        .Bairro = Trim$("" & rsConsulta("BAIRRO"))
+        .CEP = Trim$("" & rsConsulta("CEP"))
+        .CPFCnpj = Trim$("" & rsConsulta("CPF"))
+        .Endereco = Trim$("" & rsConsulta("ENDERECO"))
+        .NOME = Trim$("" & rsConsulta("NOME"))
+        .UnidadeFederativa = Trim$("" & rsConsulta("UF"))
+        .Cidade = Trim$("" & rsConsulta("CIDADE"))
+    End With
+    
+    Set Sacador = New clsSacador
+    
+    With Sacador
+        .NOME = Trim$("" & rsConsulta("NOME"))
+        .CPFCnpj = Trim$("" & rsConsulta("CPF"))
+    End With
+        
+    Select Case Banco
+        Case "356"
+            Set BoletoReal = New clsBoletoReal
+            Set GerarBoletoInscricaoPosGraduacao = BoletoReal.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                CodigoCedente, "9", Vencimento, valorTitulo, nossoNumero, "101", Mensagem(), Sacado, Sacador)
+            
+        Case "033"
+            Set BoletoSantander = New clsBoletoSantander
+            If bBoletoReg Then
+                 Set GerarBoletoInscricaoPosGraduacao = BoletoSantander.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                     CodigoCedente, Estacao, "9", Vencimento, valorTitulo, nossoNumero, "101", Mensagem(), Sacado, Sacador)
+            
+            Else
+                Set GerarBoletoInscricaoPosGraduacao = BoletoSantander.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                         CodigoCedente, Estacao, "9", Vencimento, valorTitulo, nossoNumero, "102", Mensagem(), Sacado, Sacador)
+            End If
+    End Select
+    
+    GerarBoletoInscricaoPosGraduacao.ValorRetorno.CodigoBarrasCodificado = GerarCodigoBarraCodificado(GerarBoletoInscricaoPosGraduacao.ValorRetorno.CodigoBarras)
+    
+    Exit Function
+Tratamento:
+    Set GerarBoletoInscricaoPosGraduacao = New clsRetornoMetodo
+    With GerarBoletoInscricaoPosGraduacao
+        .CodigoErro = Err.Number
+        .Descricao = Err.Description
+        .Retorno = False
+        Set .ValorRetorno = Nothing
+    End With
+    Call AlertaErro("Financeiro", "GerarBoletoInscricaoPosGraduacao " & "INSCRICAO " & Inscricao & " - " & Err.Description)
+End Function
+
+Public Function GerarBoletoNegociacao(ByVal Cpd As String, ByVal CodigoBoleto As String, _
+                                       ByVal AnoReferencia As String) As clsRetornoMetodo
+                                       
+    
+    Dim AlunoFinanceiro                         As clsAlunoFinanceiro
+    Dim RetornoMetodo                           As clsRetornoMetodo
+    
+    Dim ControleAluno                           As clsAlunoFinanceiroControle
+    
+    Dim nossoNumero                             As String
+    
+    Dim agencia                                 As String
+    Dim CodigoCedente                           As String
+    Dim ComplemententoConta                     As String
+    Dim Banco                                   As String
+    Dim Estacao                                 As String
+    Dim Vencimento                              As String
+    Dim NomeCedente                             As String
+    
+    Dim BoletoSantander                         As clsBoletoSantander
+    Dim BoletoReal                              As clsBoletoReal
+    Dim Sacado                                  As clsSacado
+    Dim Sacador                                 As clsSacador
+    
+    Dim CodigoBarrasCodificado                  As String
+    
+    Dim valorTitulo                             As Currency
+    
+    Dim sSql                                    As String
+    
+    Dim rsConsulta                              As ADODB.Recordset
+    
+    Dim iContadorMensagens                      As Integer
+    
+On Error GoTo Tratamento
+             
+    #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+        Call Abrir_Conexao(bBancoTeste)
+    #End If
+    
+    Gb_Graduacao = bBancoGraduacao
+    
+    Set ControleAluno = New clsAlunoFinanceiroControle
+    
+    ControleAluno.BancoGraduacao = bBancoGraduacao
+    
+    Set RetornoMetodo = ControleAluno.BuscarDadosAluno(Cpd)
+    
+    If Not RetornoMetodo.Retorno Then
+        Set GerarBoletoNegociacao = RetornoMetodo
+        
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+    
+    Set AlunoFinanceiro = RetornoMetodo.ValorRetorno
+    Set ControleAluno = Nothing
+     
+   
+    Call PG_BuscarContaCompensacaoBoletoRegistrado_Aluno(Cpd, agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente, "", Estacao)
+   
+    
+    
+    If Trim$(agencia) = "" Or Trim$(CodigoCedente) = "" Or Trim$(ComplemententoConta) = "" Then
+        Set GerarBoletoNegociacao = New clsRetornoMetodo
+        With GerarBoletoNegociacao
+            .CodigoErro = 0
+            .Descricao = "Faltam informações da conta."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+    
+    sSql = ""
+    If bBancoGraduacao Then
+        sSql = sSql & "SELECT  ISNULL(PF46VALNEG,0)        AS VALORNEGOCIADO, "
+        sSql = sSql & "        PF46DATVEN                  AS VENCIMENTO "
+        sSql = sSql & "FROM    PF46BOLNET "
+        sSql = sSql & "WHERE   1=1 "
+        sSql = sSql & "        AND FK4637CPDALU     = " & Cpd
+        sSql = sSql & "        AND PF46BOLETA       = '" & CodigoBoleto & "' "
+        sSql = sSql & "        AND PF46ANOBOL       = " & AnoReferencia
+        sSql = sSql & "        AND EXISTS ( "
+        sSql = sSql & "            SELECT  * "
+        sSql = sSql & "            FROM    PF47BOLETT "
+        sSql = sSql & "            WHERE   1=1 "
+        sSql = sSql & "                    AND FK4746BOLETA = PF46BOLETA "
+        sSql = sSql & "                    AND FK4746ANOBOL = PF46ANOBOL "
+        sSql = sSql & "                    AND FK4746CPDALU = FK4637CPDALU ) "
+        
+        Set rsConsulta = G_CONEXAO_ADO.Execute(sSql)
+    Else
+        sSql = sSql & "SELECT  ISNULL(EX46VALNEG,0)        AS VALORNEGOCIADO, "
+        sSql = sSql & "        EX46DATVEN                  AS VENCIMENTO "
+        sSql = sSql & "FROM    EX46BOLNET "
+        sSql = sSql & "WHERE   1=1 "
+        sSql = sSql & "        AND FK4637CPDALU     = " & Cpd
+        sSql = sSql & "        AND EX46BOLETA       = '" & CodigoBoleto & "' "
+        sSql = sSql & "        AND EX46ANOBOL       = " & AnoReferencia
+        sSql = sSql & "        AND EXISTS ( "
+        sSql = sSql & "            SELECT  * "
+        sSql = sSql & "            FROM    EX47BOLETT "
+        sSql = sSql & "            WHERE   1=1 "
+        sSql = sSql & "                    AND FK4746BOLETA = EX46BOLETA "
+        sSql = sSql & "                    AND FK4746ANOBOL = EX46ANOBOL "
+        sSql = sSql & "                    AND FK4746CPDALU = FK4637CPDALU ) "
+        
+        Set rsConsulta = G_CONEXAO_EXT.Execute(sSql)
+    End If
+    
+    If rsConsulta.EOF Then
+        Set GerarBoletoNegociacao = New clsRetornoMetodo
+        With GerarBoletoNegociacao
+            .CodigoErro = 0
+            .Descricao = "Não foi possível localizar informações sobre a negociação."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+    
+    valorTitulo = CCur(rsConsulta("VALORNEGOCIADO"))
+    Vencimento = Format$(rsConsulta("VENCIMENTO"), GC_FORMATO_DATA)
+    
+    If valorTitulo <= 0 Then
+        Set GerarBoletoNegociacao = New clsRetornoMetodo
+        
+        With GerarBoletoNegociacao
+            .CodigoErro = 0
+            .Descricao = "Valor do título precisa ser maior que zero."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+    
+    Gb_Graduacao = bBancoGraduacao
+    
+    nossoNumero = FG_GeraNossoNumero(CodigoBoleto, AnoReferencia, Cpd, eBoletoNegociacao)
+    nossoNumero = FG_GeraNossoNumero_400(nossoNumero, Cpd, eBoletoNegociacao, Vencimento, AnoReferencia, CodigoBoleto, CStr(valorTitulo))
+
+    '----------------------------------------------- Controlador ---
+    If NOssoNumeronaTB09(nossoNumero) Then
+      Set BoletoSantander = New clsBoletoSantander
+      Set GerarBoletoNegociacao = BoletoSantander.ObterBoleto_T9(nossoNumero)
+      Exit Function
+    Else
+      If CDate(Vencimento) < CDate(FG_Data_Sistema) Then
+         Set GerarBoletoNegociacao = New clsRetornoMetodo
+          With GerarBoletoNegociacao
+              .CodigoErro = 0
+              .Descricao = "Vencimento Inválido: " & Vencimento
+              .Retorno = False
+              Set .ValorRetorno = Nothing
+          End With
+          Call AlertaErro("Financeiro", "GerarBoletoNegociacao" & "Vencimento Inválido: " & Vencimento & " - Negociação " & "NossoNumero: " & nossoNumero)
+         Exit Function
+      End If
+    End If
+    '---------------------------------------------
+    
+    
+    
+    Mensagem(1) = "Valor Negociado: " & Format$(valorTitulo, GC_FORMATO_MOEDA)
+    Mensagem(2) = "NÃO RECEBER APÓS O VENCIMENTO. "
+    
+    sSql = ""
+    If bBancoGraduacao Then
+        sSql = sSql & "SELECT  PF47CODBOL + '/' + CAST(PF47ANOBOL AS VARCHAR(5)) AS CODBOL "
+        sSql = sSql & "FROM    PF47BOLETT "
+        sSql = sSql & "WHERE   1=1 "
+        sSql = sSql & "        AND FK4746ANOBOL = " & AnoReferencia
+        sSql = sSql & "        AND FK4746BOLETA = '" & CodigoBoleto & "' "
+        sSql = sSql & "        AND FK4746CPDALU = " & Cpd
+        
+        Set rsConsulta = G_CONEXAO_ADO.Execute(sSql)
+    Else
+        sSql = sSql & "SELECT  EX47CODBOL + '/' + CAST(EX47ANOBOL AS VARCHAR(5)) AS CODBOL "
+        sSql = sSql & "FROM    EX47BOLETT "
+        sSql = sSql & "WHERE   1=1 "
+        sSql = sSql & "        AND FK4746ANOBOL = " & AnoReferencia
+        sSql = sSql & "        AND FK4746BOLETA = '" & CodigoBoleto & "' "
+        sSql = sSql & "        AND FK4746CPDALU = " & Cpd
+        
+        Set rsConsulta = G_CONEXAO_EXT.Execute(sSql)
+    End If
+    
+    Mensagem(3) = "Boletas Negociadas:"
+    iContadorMensagens = 4
+
+    Do While Not rsConsulta.EOF
+        If rsConsulta.AbsolutePosition Mod 4 = 0 Then
+            iContadorMensagens = iContadorMensagens + 1
+        End If
+        
+        If iContadorMensagens >= 10 Then Exit Do
+    
+        Mensagem(iContadorMensagens) = Mensagem(iContadorMensagens) & rsConsulta("CODBOL") & ", "
+           
+        rsConsulta.MoveNext
+    Loop
+    
+    Mensagem(iContadorMensagens) = Mid$(Mensagem(iContadorMensagens), 1, Len(Mensagem(iContadorMensagens)) - 2)
+        
+    Set Sacado = New clsSacado
+    
+    With Sacado
+        .Bairro = AlunoFinanceiro.Bairro
+        .CEP = AlunoFinanceiro.CEP
+        .CPFCnpj = AlunoFinanceiro.cpf
+        .Endereco = AlunoFinanceiro.Endereco
+        .NOME = AlunoFinanceiro.NOME
+        .UnidadeFederativa = AlunoFinanceiro.UnidadeFederativa
+        .Cidade = AlunoFinanceiro.Cidade
+    End With
+    
+    Set Sacador = New clsSacador
+    
+    With Sacador
+        .NOME = AlunoFinanceiro.Contratante.NOME
+        .CPFCnpj = AlunoFinanceiro.Contratante.cpf
+    End With
+        
+    Select Case Banco
+        Case "356"
+        
+            Set BoletoReal = New clsBoletoReal
+            Set GerarBoletoNegociacao = BoletoReal.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                CodigoCedente, "9", Vencimento, valorTitulo, nossoNumero, "102", Mensagem(), Sacado, Sacador)
+            
+        Case "033" '-- Tatilon Roberto -- 13.12.2016
+        
+            Set BoletoSantander = New clsBoletoSantander
+            If bBoletoReg Then
+            
+               If Not bBoletoRemessa Then
+                    Set GerarBoletoNegociacao = BoletoSantander.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                             CodigoCedente, Estacao, "9", Vencimento, valorTitulo, nossoNumero, "101", Mensagem(), Sacado, Sacador)
+                                                                             
+               Else
+                   Set GerarBoletoNegociacao = BoletoSantander.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                       CodigoCedente, Estacao, "9", Vencimento, valorTitulo, nossoNumero, "104", Mensagem(), Sacado, Sacador)
+                 
+               End If
+                  
+            Else
+            Set GerarBoletoNegociacao = BoletoSantander.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                     CodigoCedente, Estacao, "9", Vencimento, valorTitulo, nossoNumero, "102", Mensagem(), Sacado, Sacador)
+                                                                     
+            End If
+    End Select
+    
+    GerarBoletoNegociacao.ValorRetorno.CodigoBarrasCodificado = GerarCodigoBarraCodificado(GerarBoletoNegociacao.ValorRetorno.CodigoBarras)
+    
+    Exit Function
+Tratamento:
+    Set GerarBoletoNegociacao = New clsRetornoMetodo
+    With GerarBoletoNegociacao
+        .CodigoErro = Err.Number
+        .Descricao = Err.Description
+        .Retorno = False
+        Set .ValorRetorno = Nothing
+    End With
+    
+    #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+        Call Fechar_Conexao
+    #End If
+End Function
+
+
+Public Function GerarBoletoCredNegociacao(ByVal Cpd As String, ByVal CodigoBoleto As String, _
+                                       ByVal AnoReferencia As String) As clsRetornoMetodo
+                                       
+    
+    Dim AlunoFinanceiro                         As clsAlunoFinanceiro
+    Dim RetornoMetodo                           As clsRetornoMetodo
+    
+    Dim ControleAluno                           As clsAlunoFinanceiroControle
+    
+    Dim nossoNumero                             As String
+    
+    Dim agencia                                 As String
+    Dim CodigoCedente                           As String
+    Dim ComplemententoConta                     As String
+    Dim Banco                                   As String
+    Dim Estacao                                 As String
+    Dim Vencimento                              As String
+    Dim NomeCedente                             As String
+    
+    Dim BoletoSantander                         As clsBoletoSantander
+    Dim BoletoReal                              As clsBoletoReal
+    Dim Sacado                                  As clsSacado
+    Dim Sacador                                 As clsSacador
+    Dim cBoleto                                 As clsBoleto
+    
+    Dim CodigoBarrasCodificado                  As String
+    
+    Dim valorTitulo                             As Currency
+    
+    Dim sSql                                    As String
+    
+    Dim rsConsulta                              As ADODB.Recordset
+    
+    Dim iContadorMensagens                      As Integer
+    
+On Error GoTo Tratamento
+             
+    #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+        Call Abrir_Conexao(bBancoTeste)
+    #End If
+    
+    Gb_Graduacao = bBancoGraduacao
+    
+    Set ControleAluno = New clsAlunoFinanceiroControle
+    
+    ControleAluno.BancoGraduacao = bBancoGraduacao
+    
+    Set RetornoMetodo = ControleAluno.BuscarDadosAluno(Cpd)
+    
+    If Not RetornoMetodo.Retorno Then
+        Set GerarBoletoCredNegociacao = RetornoMetodo
+        
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+    
+    Set AlunoFinanceiro = RetornoMetodo.ValorRetorno
+    
+    Set ControleAluno = Nothing
+    
+    'FIXEDME
+    'Criar modelo de conta bancario
+    'e indicar a conta ao curso
+    'Call PG_BuscarContaCompensacaoBoleto_Aluno(CPD, Agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente)
+    
+    If bBoletoReg Then
+        Call PG_BuscarContaCompensacaoBoletoRegistrado_Aluno(Cpd, agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente, "", Estacao)
+    Else
+        Call PG_BuscarContaCompensacaoBoleto_Aluno(Cpd, agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente)
+    End If
+    
+    
+    If Trim$(agencia) = "" Or Trim$(CodigoCedente) = "" Or Trim$(ComplemententoConta) = "" Then
+        Set GerarBoletoCredNegociacao = New clsRetornoMetodo
+        With GerarBoletoCredNegociacao
+            .CodigoErro = 0
+            .Descricao = "Faltam informações da conta."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+    
+    '------------------------------------------------------------------------------------
+    'Data: 20/07/2014
+    'Autor: Nadson Silva Timbó
+    'Busca de dados para a negociação do Crediceuma seguindo as regras anteriores
+    '------------------------------------------------------------------------------------
+    
+    
+    Set cBoleto = New clsBoleto
+    
+    cBoleto.CodBol = CodigoBoleto
+    cBoleto.AnoBol = AnoReferencia
+    
+    cBoleto.AlunoContratoPagamento = True
+    
+    'cBoleto.BoletoNegociacao = CPD
+    
+    
+     sSql = "SELECT PF37CODBAN, PF37CPDALU, PF37MATALU, PF37NOMEAL, PF37ENDERE, PF37BAIRRO, " & _
+       " PF37CIDADE, PF37NUMCEP, PF37UNIFED, PF37NUMCPF,  " & _
+       " PF37MATALU, PF37CDTURM, FKB7B5CODCAM as Campus, FKB701CODIGO as Curso, "
+    
+    If Not cBoleto.AlunoContratoPagamento Then
+       sSql = sSql & " PF44CODPAR AS MBCODBOL, " & _
+          " PF44DATVEN AS VENCIMENTO, " & _
+          " ISNULL(PF44LOCPAG,1) AS MBLOCPAG, " & _
+          " PF44DESCON AS MBDESCON, " & _
+          " PF44ANOPAR AS MBANOBOL, " & _
+          " PF44SITPAR AS MBSITBOL, " & _
+          " PF44VALBAS AS VALORNEGOCIADO, " & _
+          " PF44DATPAG AS MBDATPAG, " & _
+          " FK4446BOLETA, FK4446ANOBOL,  "
+   
+       sSql = sSql & " PFA9CPF, PFA9NOME " & _
+                     " From PF37ALUNOT (nolock), PF44BOLPAT (nolock), PFA9CONALT (nolock), PF34CURALT (nolock), PFB7CAMCUT (nolock) "
+       sSql = sSql & " Where PF37CPDALU = " & Cpd & " " & _
+          " AND FK4437CPDALU = PF37CPDALU " & _
+          " AND FK4446ANOBOL = " & AnoReferencia & " " & _
+          " AND FK4446BOLETA = '" & CodigoBoleto & "' " & _
+          " AND FK37A9CPF *= PFA9CPF " & _
+          " AND PF37CPDALU = FK3437CPDALU " & _
+          " AND FK34B7CODIGO = PFB7CODIGO " & _
+          " AND PF44SITPAR = '" & G_Boleta_Aberto & "' "
+    Else
+       sSql = sSql & " PFP7CODPAR AS MBCODBOL, " & _
+          " PFP7DATVEN AS VENCIMENTO, " & _
+          " ISNULL(PFP7LOCPAG,1) AS MBLOCPAG, " & _
+          " PFP7DESCON AS MBDESCON, " & _
+          " PFP7ANOPAR AS MBANOBOL, " & _
+          " PFP7SITPAR AS MBSITBOL, " & _
+          " PFP7VALBAS AS VALORNEGOCIADO, " & _
+          " PFP7DATPAG AS MBDATPAG, " & _
+          " FKP7P8BOLETA, FKP7P8ANOBOL,  "
+   
+       sSql = sSql & " PFA9CPF, PFA9NOME " & _
+                     " From PF37ALUNOT (nolock), PFP7PNEGFI (nolock), PFA9CONALT (nolock), PF34CURALT (nolock), PFB7CAMCUT (nolock) "
+       sSql = sSql & " Where PF37CPDALU = " & Cpd & " " & _
+          " AND FKP737CPDALU = PF37CPDALU " & _
+          " AND FKP7P8ANOBOL = " & AnoReferencia & " " & _
+          " AND FKP7P8BOLETA = '" & CodigoBoleto & "' " & _
+          " AND FK37A9CPF *= PFA9CPF " & _
+          " AND PF37CPDALU = FK3437CPDALU " & _
+          " AND FK34B7CODIGO = PFB7CODIGO " & _
+          " AND PFP7SITPAR = '" & G_Boleta_Aberto & "' "
+
+    End If
+    
+    Set rsConsulta = G_CONEXAO_ADO.Execute(sSql)
+    
+    If rsConsulta.EOF Then
+        Set GerarBoletoCredNegociacao = New clsRetornoMetodo
+        With GerarBoletoCredNegociacao
+            .CodigoErro = 0
+            .Descricao = "Não foi possível localizar informações sobre a negociação."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+    
+    valorTitulo = CCur(rsConsulta("VALORNEGOCIADO"))
+    Vencimento = Format$(rsConsulta("VENCIMENTO"), GC_FORMATO_DATA)
+    
+    If valorTitulo <= 0 Then
+        Set GerarBoletoCredNegociacao = New clsRetornoMetodo
+        
+        With GerarBoletoCredNegociacao
+            .CodigoErro = 0
+            .Descricao = "Valor do título precisa ser maior que zero."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+    
+    Gb_Graduacao = bBancoGraduacao
+    
+    nossoNumero = FG_GeraNossoNumero(CodigoBoleto, AnoReferencia, Cpd, eBoletoCrediNegoc)
+        
+    'Modificado
+    nossoNumero = FG_GeraNossoNumero_400(nossoNumero, Cpd, eBoletoCrediNegoc, Vencimento, AnoReferencia, CodigoBoleto, CStr(valorTitulo))
+    
+    Mensagem(1) = "CPD: " & Cpd & " -> Negociação " & CREDICEUMA
+    Mensagem(2) = "Valor Negociado (" & CodigoBoleto & "/" & AnoReferencia & "): " & Format$(valorTitulo, GC_FORMATO_MOEDA)
+    Mensagem(3) = "NÃO RECEBER APÓS O VENCIMENTO. "
+    
+    sSql = ""
+    If bBancoGraduacao Then
+        sSql = sSql & "SELECT  PFP9CODBOL + '/' + CAST(PFP9ANOBOL AS VARCHAR(5)) AS CODBOL "
+        sSql = sSql & "FROM    PFP9BOLFIN "
+        sSql = sSql & "WHERE   1=1 "
+        sSql = sSql & "        AND FKP9P8ANOBOL = " & AnoReferencia
+        sSql = sSql & "        AND FKP9P8BOLETA = '" & CodigoBoleto & "' "
+        sSql = sSql & "        AND FKP937CPDALU = " & Cpd
+        
+        Set rsConsulta = G_CONEXAO_ADO.Execute(sSql)
+    End If
+    
+    Mensagem(4) = "Boletas Negociadas:"
+    iContadorMensagens = 5
+
+    Do While Not rsConsulta.EOF
+        If rsConsulta.AbsolutePosition Mod 5 = 0 Then
+            iContadorMensagens = iContadorMensagens + 1
+        End If
+        
+        If iContadorMensagens >= 10 Then Exit Do
+    
+        Mensagem(iContadorMensagens) = Mensagem(iContadorMensagens) & rsConsulta("CODBOL") & ", "
+           
+        rsConsulta.MoveNext
+    Loop
+    
+    Mensagem(iContadorMensagens) = Mid$(Mensagem(iContadorMensagens), 1, Len(Mensagem(iContadorMensagens)) - 2)
+        
+    Set Sacado = New clsSacado
+    
+    With Sacado
+        .Bairro = AlunoFinanceiro.Bairro
+        .CEP = AlunoFinanceiro.CEP
+        .CPFCnpj = AlunoFinanceiro.cpf
+        .Endereco = AlunoFinanceiro.Endereco
+        .NOME = AlunoFinanceiro.NOME
+        .UnidadeFederativa = AlunoFinanceiro.UnidadeFederativa
+        .Cidade = AlunoFinanceiro.Cidade
+    End With
+    
+    Set Sacador = New clsSacador
+    
+    With Sacador
+        .NOME = AlunoFinanceiro.Contratante.NOME
+        .CPFCnpj = AlunoFinanceiro.Contratante.cpf
+    End With
+        
+    Select Case Banco
+        Case "356"
+        
+            Set BoletoReal = New clsBoletoReal
+            Set GerarBoletoCredNegociacao = BoletoReal.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                CodigoCedente, "9", Vencimento, valorTitulo, nossoNumero, "102", Mensagem(), Sacado, Sacador)
+            
+        Case "033"
+        
+            Set BoletoSantander = New clsBoletoSantander
+            
+            If bBoletoReg Then
+            
+                   Set GerarBoletoCredNegociacao = BoletoSantander.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                     CodigoCedente, Estacao, "9", Vencimento, valorTitulo, nossoNumero, "101", Mensagem(), Sacado, Sacador)
+            Else
+                   Set GerarBoletoCredNegociacao = BoletoSantander.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                     CodigoCedente, Estacao, "9", Vencimento, valorTitulo, nossoNumero, "102", Mensagem(), Sacado, Sacador)
+            End If
+    End Select
+    
+    GerarBoletoCredNegociacao.ValorRetorno.CodigoBarrasCodificado = GerarCodigoBarraCodificado(GerarBoletoCredNegociacao.ValorRetorno.CodigoBarras)
+    
+    Exit Function
+Tratamento:
+    Set GerarBoletoCredNegociacao = New clsRetornoMetodo
+    With GerarBoletoCredNegociacao
+        .CodigoErro = Err.Number
+        .Descricao = Err.Description
+        .Retorno = False
+        Set .ValorRetorno = Nothing
+    End With
+    
+    #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+        Call Fechar_Conexao
+    #End If
+End Function
+
+#If Not VEST And Not Extensao Then
+Public Function GerarBoletoAcademia(ByVal Contrato As String, ByVal CodigoBoleto As String, _
+                                    ByVal AnoBoleto As String) As clsRetornoMetodo
+
+
+    
+    Dim ControleAcademia                        As clsAcademia
+    
+    Dim RetornoMetodo                           As clsRetornoMetodo
+    
+        
+    Dim nossoNumero                             As String
+    
+    Dim agencia                                 As String
+    Dim CodigoCedente                           As String
+    Dim ComplemententoConta                     As String
+    Dim Banco                                   As String
+    Dim Vencimento                              As String
+    Dim Estacao                                 As String
+    
+    Dim NomeCedente                             As String
+    
+    Dim BoletoSantander                         As clsBoletoSantander
+    Dim BoletoReal                              As clsBoletoReal
+    Dim Sacado                                  As clsSacado
+    Dim Sacador                                 As clsSacador
+    
+    Dim CodigoBarrasCodificado                  As String
+    
+    Dim valorTitulo                             As Currency
+    
+On Error GoTo Tratamento
+
+    #If Not Pedagogico And Not Caixa And Not SPF_FINANCA Then
+        Call Abrir_Conexao(bBancoTeste)
+    #End If
+             
+    Set ControleAcademia = New clsAcademia
+    
+    ControleAcademia.CodigoContrato = Contrato
+       
+    If Not ControleAcademia.Achou Then
+        Set GerarBoletoAcademia = New clsRetornoMetodo
+        
+        With GerarBoletoAcademia
+            .Retorno = False
+            .CodigoErro = 0
+            .Descricao = "Não foi possível localizar informações sobre o contrato informado."
+            Set .ValorRetorno = Nothing
+        End With
+        
+        #If Not Pedagogico And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+        
+    
+    'FIXEDME
+    'Criar modelo de conta bancario
+    'e indicar a conta ao curso
+    Call PG_BuscarContaCompensacaoBoleto_Academia(agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente)
+    
+    If Trim$(agencia) = "" Or Trim$(CodigoCedente) = "" Or Trim$(ComplemententoConta) = "" Then
+        Set GerarBoletoAcademia = New clsRetornoMetodo
+        With GerarBoletoAcademia
+            .CodigoErro = 0
+            .Descricao = "Faltam informações referente a conta de compensação."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        
+        #If Not Pedagogico And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+    
+    cValorLiquido = ControleAcademia.ValorBoleta(Contrato, CInt(AnoBoleto), CodigoBoleto, FG_Data_Sistema, "L")
+    
+    valorTitulo = cValorLiquido
+    
+    If valorTitulo <= 0 Then
+        Set GerarBoletoAcademia = New clsRetornoMetodo
+        
+        With GerarBoletoAcademia
+            .CodigoErro = 0
+            .Descricao = "Valor do título precisa ser maior que zero."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        
+        #If Not Pedagogico And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+    
+    Vencimento = ControleAcademia.RetornarVencimentoParcela(Contrato, CodigoBoleto, AnoBoleto)
+
+    nossoNumero = FG_GeraNossoNumero(CodigoBoleto, AnoBoleto, Contrato, eBoletoAcademia)
+    
+    'Para academia é utilizado o Número do Contrato
+    nossoNumero = FG_GeraNossoNumero_400(nossoNumero, Contrato, eBoletoAcademia, Vencimento, AnoBoleto, CodigoBoleto, CStr(valorTitulo))
+    
+    
+    ControleAcademia.DataVencimento = Vencimento
+    
+    Call ControleAcademia.MsgBoleto
+    
+    'Mensagens
+    Mensagem(1) = ControleAcademia.MensagensBoleto1
+    Mensagem(2) = ControleAcademia.MensagensBoleto2
+    Mensagem(3) = ControleAcademia.MensagensBoleto3
+    Mensagem(4) = ControleAcademia.MensagensBoleto4
+    Mensagem(5) = ControleAcademia.MensagensBoleto5
+    Mensagem(6) = ControleAcademia.MensagensBoleto6
+    Mensagem(7) = ControleAcademia.MensagensBoleto7
+    Mensagem(8) = ""
+    Mensagem(9) = ""
+           
+    Set Sacado = New clsSacado
+    
+    With Sacado
+        .Bairro = ControleAcademia.Bairro
+        .CEP = ControleAcademia.CEP
+        .CPFCnpj = ControleAcademia.CPFCliente
+        .Endereco = ControleAcademia.Endereco
+        .NOME = ControleAcademia.NomeCliente
+        .UnidadeFederativa = ControleAcademia.Estado
+        .Cidade = ControleAcademia.Cidade
+    End With
+    
+    Set Sacador = New clsSacador
+    
+    With Sacador
+        .NOME = ControleAcademia.NomeCliente
+        .CPFCnpj = ControleAcademia.CPFCliente
+    End With
+    
+        
+    Select Case Banco
+        Case "356"
+        
+            Set BoletoReal = New clsBoletoReal
+            Set GerarBoletoAcademia = BoletoReal.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                CodigoCedente, "9", Vencimento, valorTitulo, nossoNumero, "102", Mensagem(), Sacado, Sacador)
+            
+        Case "033"
+        
+            Set BoletoSantander = New clsBoletoSantander
+            
+            If bBoletoReg Then
+            Set GerarBoletoAcademia = BoletoSantander.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                     CodigoCedente, Estacao, "9", Vencimento, valorTitulo, nossoNumero, "101", Mensagem(), Sacado, Sacador)
+                               
+            
+            Else
+            
+            Set GerarBoletoAcademia = BoletoSantander.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                     CodigoCedente, Estacao, "9", Vencimento, valorTitulo, nossoNumero, "102", Mensagem(), Sacado, Sacador)
+                                                                     
+            End If
+    End Select
+    
+    GerarBoletoAcademia.ValorRetorno.CodigoBarrasCodificado = GerarCodigoBarraCodificado(GerarBoletoAcademia.ValorRetorno.CodigoBarras)
+    
+    Exit Function
+Tratamento:
+    Set GerarBoletoAcademia = New clsRetornoMetodo
+    With GerarBoletoAcademia
+        .CodigoErro = Err.Number
+        .Descricao = Err.Description
+        .Retorno = False
+        Set .ValorRetorno = Nothing
+    End With
+    
+    #If Not Pedagogico And Not Caixa And Not SPF_FINANCA Then
+        Call Fechar_Conexao
+    #End If
+
+End Function
+#End If
+Public Function GerarBoletoMensalidade_400_Teste(ByVal Cpd As String, ByVal CodigoBoleto As String, _
+                                       ByVal AnoReferencia As String) As clsRetornoMetodo
+
+
+    Dim AlunoFinanceiro                         As clsAlunoFinanceiro
+    Dim RetornoMetodo                           As clsRetornoMetodo
+
+    Dim ControleAluno                           As clsAlunoFinanceiroControle
+
+    Dim CLASSEBOLETO                            As clsBoleto
+
+    Dim nossoNumero                             As String
+    Dim NossoNumero_Banco                       As String
+
+    Dim agencia                                 As String
+    Dim CodigoCedente                           As String
+    Dim ComplemententoConta                     As String
+    Dim Banco                                   As String
+    Dim Estacao                                 As String
+    
+    Dim Vencimento                              As String
+    Dim NomeCedente                             As String
+
+    Dim BoletoSantander                         As clsBoletoSantander
+    Dim BoletoReal                              As clsBoletoReal
+    Dim Sacado                                  As clsSacado
+    Dim Sacador                                 As clsSacador
+
+    Dim CodigoBarrasCodificado                  As String
+
+    Dim valorTitulo                             As Currency
+
+    Dim sSql                                    As String
+    Dim rsConsulta                              As ADODB.Recordset
+    Dim cValor5p                                As Currency
+    Dim cGuardaLiquido                          As Currency
+
+On Error GoTo Tratamento
+
+    #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+        Call Abrir_Conexao(bBancoTeste)
+    #End If
+
+    Gb_Graduacao = bBancoGraduacao
+
+    If Not Gb_Graduacao Then
+        'Necessario para buscar o anobol do aluno
+        sSql = ""
+        sSql = sSql & "SELECT   EX47ANOBOL "
+        sSql = sSql & "FROM     EX47BOLETT "
+        sSql = sSql & "WHERE    1=1 "
+        sSql = sSql & "         AND FK4737CPDALU = " & Cpd
+        sSql = sSql & "         AND EX47CODBOL   = '" & CodigoBoleto & "' "
+
+        Set rsConsulta = G_CONEXAO_EXT.Execute(sSql)
+
+        If rsConsulta.EOF Then
+            Set GerarBoletoMensalidade_400_Teste = New clsRetornoMetodo
+            With GerarBoletoMensalidade_400_Teste
+                .CodigoErro = 0
+                .Descricao = "A ano da boleta não foi encontrado"
+                .Retorno = False
+                Set .ValorRetorno = Nothing
+            End With
+
+            Exit Function
+        Else
+            AnoReferencia = rsConsulta("EX47ANOBOL")
+        End If
+    End If
+
+
+    Set ControleAluno = New clsAlunoFinanceiroControle
+
+    ControleAluno.BancoGraduacao = bBancoGraduacao
+
+    Set RetornoMetodo = ControleAluno.BuscarDadosAluno(Cpd)
+
+    If Not RetornoMetodo.Retorno Then
+        Set GerarBoletoMensalidade_400_Teste = RetornoMetodo
+
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+
+        Exit Function
+    End If
+
+
+    Set AlunoFinanceiro = RetornoMetodo.ValorRetorno
+
+    Set ControleAluno = Nothing
+
+    'FIXEDME
+    'Criar modelo de conta bancario
+    'e indicar a conta ao curso
+    If bBoletoReg Then
+        Call PG_BuscarContaCompensacaoBoletoRegistrado_Aluno(Cpd, agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente, "", Estacao)
+    Else
+        Call PG_BuscarContaCompensacaoBoleto_Aluno(Cpd, agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente)
+    End If
+    If Trim$(agencia) = "" Or Trim$(CodigoCedente) = "" Or Trim$(ComplemententoConta) = "" Then
+        Set GerarBoletoMensalidade_400_Teste = New clsRetornoMetodo
+        With GerarBoletoMensalidade_400_Teste
+            .CodigoErro = 0
+            .Descricao = "Faltam informações da conta."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+
+        Exit Function
+    End If
+
+    Set CLASSEBOLETO = New clsBoleto
+
+    CLASSEBOLETO.gbGraduacao = bBancoGraduacao
+
+    #If Euroam Then
+        cValorLiquido = FG_Valor_Boleta(CLng(Cpd), CInt(AnoReferencia), CodigoBoleto, FG_Data_Sistema("DD/MM/YYYY"))
+        cGuardaLiquido = cValorLiquido
+        Call CLASSEBOLETO.ValorBoleta(Cpd, CInt(AnoReferencia), CodigoBoleto, FG_Data_Sistema("DD/MM/YYYY"))
+        '--- padronizando para o boleto registrado -- Tatilon 05.07.2017
+        cValorLiquido = cValorBase - tDadosBoleto.ValorProuni - tDadosBoleto.ValorFies - tDadosBoleto.valorDesconto
+        '- tDadosBoleto.ValorDesconto
+
+        If cBolsaR7 <> 0 Then
+                cValorLiquido = cValorBase - tDadosBoleto.ValorProuni - tDadosBoleto.ValorFies
+                cBolsaR7 = 0
+        End If
+
+
+
+    #Else
+        Call CLASSEBOLETO.ValorBoleta(Cpd, CInt(AnoReferencia), CodigoBoleto, FG_Data_Sistema("DD/MM/YYYY"))
+    #End If
+
+    valorTitulo = cValorLiquido
+
+    If G_sTipoMen = "F" Then '-------- Tatilon Roberto ------
+        valorTitulo = cValorBase
+        G_sTipoMen = ""
+    End If
+
+    If valorTitulo <= 0 Then
+        Set GerarBoletoMensalidade_400_Teste = New clsRetornoMetodo
+
+        With GerarBoletoMensalidade_400_Teste
+            .CodigoErro = 0
+            .Descricao = "Valor do título precisa ser maior que zero."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+
+        Exit Function
+    End If
+
+    Vencimento = CLASSEBOLETO.RetornarVencimentoParcela(Cpd, CodigoBoleto, AnoReferencia)
+
+    nossoNumero = FG_GeraNossoNumero(CodigoBoleto, AnoReferencia, Cpd, eBoletoNormal)
+
+    'Modificado
+    'If Not FG_Programando Then
+        nossoNumero = FG_GeraNossoNumero_400(nossoNumero, Cpd, eBoletoNormal, Vencimento, AnoReferencia, CodigoBoleto, CStr(valorTitulo))
+    'End If
+
+    Call MensagensMensalidade(Cpd, CodigoBoleto, AnoReferencia, AlunoFinanceiro.Matricula, Vencimento)
+
+    Set Sacado = New clsSacado
+
+    With Sacado
+        .Bairro = AlunoFinanceiro.Bairro
+        .CEP = AlunoFinanceiro.CEP
+        .CPFCnpj = AlunoFinanceiro.cpf
+        .Endereco = AlunoFinanceiro.Endereco
+        .NOME = AlunoFinanceiro.NOME
+        .UnidadeFederativa = AlunoFinanceiro.UnidadeFederativa
+        .Cidade = AlunoFinanceiro.Cidade
+    End With
+
+    Set Sacador = New clsSacador
+
+    With Sacador
+        .NOME = AlunoFinanceiro.Contratante.NOME
+        .CPFCnpj = AlunoFinanceiro.Contratante.cpf
+    End With
+
+    Select Case Banco
+        Case "356"
+            Set BoletoReal = New clsBoletoReal
+            Set GerarBoletoMensalidade_400_Teste = BoletoReal.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                CodigoCedente, "9", Vencimento, valorTitulo, nossoNumero, "102", Mensagem(), Sacado, Sacador, FG_Retorna_Situacao_Boleta(Cpd, CodigoBoleto, AnoReferencia))
+
+        Case "033"
+            Set BoletoSantander = New clsBoletoSantander '-- Tatilon 13.12.2016
+            If bBoletoReg Then
+
+            Set GerarBoletoMensalidade_400_Teste = BoletoSantander.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                    CodigoCedente, Estacao, "9", Vencimento, valorTitulo, nossoNumero, "101", Mensagem(), Sacado, Sacador, FG_Retorna_Situacao_Boleta(Cpd, CodigoBoleto, AnoReferencia))
+
+            Else
+
+            Set GerarBoletoMensalidade_400_Teste = BoletoSantander.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                    CodigoCedente, Estacao, "9", Vencimento, valorTitulo, nossoNumero, "102", Mensagem(), Sacado, Sacador, FG_Retorna_Situacao_Boleta(Cpd, CodigoBoleto, AnoReferencia))
+            End If
+    End Select
+
+    GerarBoletoMensalidade_400_Teste.ValorRetorno.CodigoBarrasCodificado = GerarCodigoBarraCodificado(GerarBoletoMensalidade_400_Teste.ValorRetorno.CodigoBarras)
+
+    Exit Function
+Tratamento:
+    Set GerarBoletoMensalidade_400_Teste = New clsRetornoMetodo
+    With GerarBoletoMensalidade_400_Teste
+        .CodigoErro = Err.Number
+        .Descricao = Err.Description
+        .Retorno = False
+        Set .ValorRetorno = Nothing
+    End With
+
+    #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+        Call Fechar_Conexao
+    #End If
+End Function
+Public Function GerarBoletoInscricaoVestibular(ByVal Inscricao As String) As clsRetornoMetodo
+'*********************************************************************************************************************************
+'*********************************************************************************************************************************
+'*********************************************************************************************************************************
+'*********************************************************************************************************************************
+'*********************************************************************************************************************************
+'*********************************************************************************************************************************
+'*********************************************************************************************************************************
+'*********************************************************************************************************************** -- AKI
+    Dim Vencimento                              As String
+    Dim valorTitulo                             As Currency
+    Dim nossoNumero                             As String
+    
+    Dim agencia                                 As String
+    Dim CodigoCedente                           As String
+    Dim ComplemententoConta                     As String
+    Dim Banco                                   As String
+    Dim Estacao                                 As String
+    
+    Dim NomeCedente                             As String
+    
+    Dim BoletoReal                              As clsBoletoReal
+    Dim BoletoSantander                         As clsBoletoSantander
+
+    Dim Sacado                                  As clsSacado
+    Dim Sacador                                 As clsSacador
+    
+    Dim CodigoBarrasCodificado                  As String
+    
+    Dim sSql                                    As String
+    
+    Dim rsConsulta                              As ADODB.Recordset
+    
+    Dim sCampus                                 As String
+
+On Error GoTo Tratamento
+
+    #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+        Call Abrir_Conexao(bBancoTeste)
+    #End If
+
+    sSql = ""
+    sSql = sSql & "SELECT  VT15CODBOL, VT15ANOBOL, VT15DATVEN, "
+    sSql = sSql & "        VT15SITBOL, VT15VALBAS, VT15OBSQUI, FK0405CODCAM AS CAM, "
+    sSql = sSql & "        VT01CANDIT.*, VT06DESCRI "
+    sSql = sSql & "FROM    VT15BOLINT, VT01CANDIT, "
+    sSql = sSql & "        VT02CURALT, VT06VESTIT, VT04CAMCUT "
+    sSql = sSql & "WHERE   1=1 "
+    sSql = sSql & "        AND FK1501INSVES = " & Inscricao
+    sSql = sSql & "        AND VT02INDOPC   = 1 "
+    sSql = sSql & "        AND FK1501INSVES = VT01INSVES "
+    sSql = sSql & "        AND FK0201INSVES = VT01INSVES "
+    sSql = sSql & "        AND FK0204CODVES = VT06CODVES "
+    sSql = sSql & "        AND FK0204ANOVES = VT06ANOVES "
+    sSql = sSql & "        AND VT04CODIGO =  FK0204CODIGO "
+    sSql = sSql & "        AND FK0406CODVES = FK0204CODVES  "
+    sSql = sSql & "        AND FK0406ANOVES = FK0204ANOVES "
+    
+    Set rsConsulta = G_CONEXAO_VEST.Execute(sSql)
+    
+
+    If rsConsulta.EOF Then
+        Set GerarBoletoInscricaoVestibular = New clsRetornoMetodo
+        With GerarBoletoInscricaoVestibular
+            .CodigoErro = 0
+            .Descricao = "Não possível localizar dados da inscrição."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+       
+        Exit Function
+    End If
+    
+    '--- passando o campus para pegar o cedente correto no boleto registrado
+    
+    If Not IsNull(rsConsulta!CAM) Then
+        sCampus = rsConsulta!CAM
+    End If
+    
+    Gb_Graduacao = True
+    
+    'Call PG_BuscarContaCompensacaoBoleto_Codigo("0", Agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente)
+    
+    '-- teste tatilon
+    If bBoletoReg Then '--- tirei a funcao de campus
+      Call PG_BuscarContaCompensacaoBoleto_Codigo_Reg("0", agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente, Estacao)
+    Else
+       Call PG_BuscarContaCompensacaoBoleto_Codigo("0", agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente)
+    End If
+    
+    If Trim$(agencia) = "" Or Trim$(CodigoCedente) = "" Or Trim$(ComplemententoConta) = "" Then
+        Set GerarBoletoInscricaoVestibular = New clsRetornoMetodo
+        With GerarBoletoInscricaoVestibular
+            .CodigoErro = 0
+            .Descricao = "Faltam informações da conta."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        Exit Function
+    End If
+    
+    valorTitulo = CCur("0" & rsConsulta("VT15VALBAS"))
+    
+    If valorTitulo <= 0 Then
+        Set GerarBoletoInscricaoVestibular = New clsRetornoMetodo
+        
+        With GerarBoletoInscricaoVestibular
+            .CodigoErro = 0
+            .Descricao = "Valor do título precisa ser maior que zero"
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        Exit Function
+    End If
+   
+    Vencimento = Format$(rsConsulta("VT15DATVEN"), GC_FORMATO_DATA)
+    
+    If valorTitulo <= 0 Then
+        Set GerarBoletoInscricaoVestibular = New clsRetornoMetodo
+        With GerarBoletoInscricaoVestibular
+            .CodigoErro = 0
+            .Descricao = "Valor do título precisa ser maior que zero."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+       
+        Exit Function
+    End If
+        
+    nossoNumero = Trim$(rsConsulta("VT15CODBOL")) & Trim$(Left$(rsConsulta("VT15ANOBOL"), 4)) & Format$(Inscricao, "0000000")
+    nossoNumero = FG_GeraNossoNumero_400(nossoNumero, Format$(Inscricao, "0000000"), eBoletoInscricaoVestibular, Vencimento, Trim$(rsConsulta("VT15ANOBOL")), Trim$(rsConsulta("VT15CODBOL")), CStr(valorTitulo))
+
+
+    '----------------------------------------------- Controlador ---
+    If NOssoNumeronaTB09(nossoNumero) Then
+      Set BoletoSantander = New clsBoletoSantander
+      Set GerarBoletoInscricaoVestibular = BoletoSantander.ObterBoleto_T9(nossoNumero)
+      Exit Function
+    Else
+      If CDate(Vencimento) < CDate(FG_Data_Sistema) Then
+          Set GerarBoletoInscricaoVestibular = New clsRetornoMetodo
+          With GerarBoletoInscricaoVestibular
+              .CodigoErro = 0
+              .Descricao = "Vencimento Inválido: " & Vencimento
+              .Retorno = False
+              Set .ValorRetorno = Nothing
+          End With
+          Call AlertaErro("Financeiro", "GerarBoletoInscricaoVestibular" & "Vencimento Inválido: " & Vencimento & " - Inscricao " & Inscricao)
+         Exit Function
+      End If
+    End If
+   '---------------------------------------------
+    
+    Mensagem(1) = Left$(Trim$(rsConsulta("VT06DESCRI")), 72)
+    Mensagem(2) = "Inscrição:" + Format$(Inscricao, "0000000")
+    Mensagem(3) = ""
+    Mensagem(4) = ""
+    Mensagem(5) = "NÃO RECEBER APÓS O VENCIMENTO"
+    Mensagem(6) = ""
+    Mensagem(7) = ""
+    Mensagem(8) = ""
+    Mensagem(9) = ""
+    
+    Set Sacado = New clsSacado
+    
+    With Sacado
+        .Bairro = Trim$("" & rsConsulta("VT01BAIRRO"))
+        .CEP = Trim$("" & rsConsulta("VT01NUMCEP"))
+        .CPFCnpj = Trim$("" & rsConsulta("VT01NUMCPF"))
+        .Endereco = Trim$("" & rsConsulta("VT01ENDERE"))
+        .NOME = Trim$("" & rsConsulta("VT01NOMEAL"))
+        .UnidadeFederativa = Trim$("" & rsConsulta("VT01UNIFED"))
+        .Cidade = Trim$("" & rsConsulta("VT01CIDADE"))
+    End With
+    
+    Set Sacador = New clsSacador
+    
+    With Sacador
+        .NOME = Trim$("" & rsConsulta("VT01NOMEAL"))
+        .CPFCnpj = Trim$("" & rsConsulta("VT01NUMCPF"))
+    End With
+        
+    Select Case Banco
+        Case "356"
+        
+            Set BoletoReal = New clsBoletoReal
+            Set GerarBoletoInscricaoVestibular = BoletoReal.ObterBoleto(Banco, agencia, _
+                                                                  NomeCedente, CodigoCedente, "9", _
+                                                                  Vencimento, valorTitulo, nossoNumero, "102", _
+                                                                  Mensagem(), Sacado, Sacador, CStr(rsConsulta("VT15SITBOL")))
+        Case "033"
+        
+            Set BoletoSantander = New clsBoletoSantander
+            
+            If bBoletoReg Then
+            
+                Set GerarBoletoInscricaoVestibular = BoletoSantander.ObterBoleto(Banco, agencia, _
+                                                                      NomeCedente, CodigoCedente, Estacao, "9", _
+                                                                      Vencimento, valorTitulo, nossoNumero, "101", _
+                                                                      Mensagem(), Sacado, Sacador, CStr(rsConsulta("VT15SITBOL")))
+            
+            
+            
+            Else
+            Set GerarBoletoInscricaoVestibular = BoletoSantander.ObterBoleto(Banco, agencia, _
+                                                                  NomeCedente, CodigoCedente, Estacao, "9", _
+                                                                  Vencimento, valorTitulo, nossoNumero, "102", _
+                                                                  Mensagem(), Sacado, Sacador, CStr(rsConsulta("VT15SITBOL")))
+            End If
+    End Select
+    
+    GerarBoletoInscricaoVestibular.ValorRetorno.CodigoBarrasCodificado = GerarCodigoBarraCodificado(GerarBoletoInscricaoVestibular.ValorRetorno.CodigoBarras)
+    
+    Exit Function
+
+    Exit Function
+Tratamento:
+    Set GerarBoletoInscricaoVestibular = New clsRetornoMetodo
+    With GerarBoletoInscricaoVestibular
+        .CodigoErro = Err.Number
+        .Descricao = Err.Description
+        .Retorno = False
+        Set .ValorRetorno = Nothing
+    End With
+End Function
+Public Function GerarBoletoMensalidade(ByVal Cpd As String, ByVal CodigoBoleto As String, _
+                                       ByVal AnoReferencia As String) As clsRetornoMetodo
+                                       
+    
+    Dim AlunoFinanceiro                         As clsAlunoFinanceiro
+    Dim RetornoMetodo                           As clsRetornoMetodo
+    
+    Dim ControleAluno                           As clsAlunoFinanceiroControle
+        
+    Dim CLASSEBOLETO                            As clsBoleto
+    
+    Dim nossoNumero                             As String
+    Dim NossoNumero_Banco                       As String
+    
+    Dim agencia                                 As String
+    Dim CodigoCedente                           As String
+    Dim ComplemententoConta                     As String
+    Dim Banco                                   As String
+    Dim Estacao                                 As String
+    Dim Vencimento                              As String
+    Dim NomeCedente                             As String
+    
+    Dim BoletoSantander                         As clsBoletoSantander
+    Dim BoletoReal                              As clsBoletoReal
+    Dim Sacado                                  As clsSacado
+    Dim Sacador                                 As clsSacador
+    
+    Dim CodigoBarrasCodificado                  As String
+    
+    Dim valorTitulo                             As String
+    
+    Dim sSql                                    As String
+    Dim rsConsulta                              As ADODB.Recordset
+    Dim cValor5p                                As Currency
+    Dim cGuardaLiquido                          As Currency
+    
+    Dim ValorLig                               As Currency
+    Dim cDadosMensagens                        As clsDadosBoletoMensagens
+    Dim Detetive As String
+    
+    
+    
+On Error GoTo Tratamento
+
+   ' Call GerarBoletoInscricaoVestibular("332525")
+    cDescontoRealReg = 0
+    ValorLig = 0
+ 
+    #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+        Call Abrir_Conexao(bBancoTeste)
+    #End If
+    
+    Gb_Graduacao = bBancoGraduacao
+    
+    If Not Gb_Graduacao Then
+        'Necessario para buscar o anobol do aluno
+        sSql = ""
+        sSql = sSql & "SELECT   EX47ANOBOL "
+        sSql = sSql & "FROM     EX47BOLETT "
+        sSql = sSql & "WHERE    1=1 "
+        sSql = sSql & "         AND FK4737CPDALU = " & Cpd
+        sSql = sSql & "         AND EX47CODBOL   = '" & CodigoBoleto & "' "
+        
+        Set rsConsulta = G_CONEXAO_EXT.Execute(sSql)
+        
+        If rsConsulta.EOF Then
+            Set GerarBoletoMensalidade = New clsRetornoMetodo
+            With GerarBoletoMensalidade
+                .CodigoErro = 0
+                .Descricao = "A ano da boleta não foi encontrado"
+                .Retorno = False
+                Set .ValorRetorno = Nothing
+            End With
+            
+            Exit Function
+        Else
+            AnoReferencia = rsConsulta("EX47ANOBOL")
+        End If
+    End If
+    
+    
+    Set ControleAluno = New clsAlunoFinanceiroControle
+   
+    ControleAluno.BancoGraduacao = bBancoGraduacao
+        
+    Set RetornoMetodo = ControleAluno.BuscarDadosAluno(Cpd)
+    
+    If Not RetornoMetodo.Retorno Then
+        Set GerarBoletoMensalidade = RetornoMetodo
+        
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+       
+  
+    Set AlunoFinanceiro = RetornoMetodo.ValorRetorno
+    
+    Set ControleAluno = Nothing
+    
+    'FIXEDME
+    'Criar modelo de conta bancario
+    'e indicar a conta ao curso
+    If bBoletoReg Then
+        Call PG_BuscarContaCompensacaoBoletoRegistrado_Aluno(Cpd, agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente, "", Estacao)
+    Else
+        Call PG_BuscarContaCompensacaoBoleto_Aluno(Cpd, agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente)
+    End If
+   
+    If Trim$(agencia) = "" Or Trim$(CodigoCedente) = "" Or Trim$(ComplemententoConta) = "" Then
+        Set GerarBoletoMensalidade = New clsRetornoMetodo
+        With GerarBoletoMensalidade
+            .CodigoErro = 0
+            .Descricao = "Faltam informações da conta."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+    
+    Set CLASSEBOLETO = New clsBoleto
+    
+    CLASSEBOLETO.gbGraduacao = bBancoGraduacao
+      
+    If bBoletoReg Then
+        valorTitulo = CLASSEBOLETO.ValorBoleta(Cpd, CInt(AnoReferencia), CodigoBoleto, FG_Data_Sistema("DD/MM/YYYY"), "B")
+        ValorLig = CLASSEBOLETO.ValorBoleta(Cpd, CInt(AnoReferencia), CodigoBoleto, FG_Data_Sistema("DD/MM/YYYY"), "L")
+        cDescontoRealReg = valorTitulo - ValorLig
+        If valorTitulo <= cDescontoRealReg Then
+            cDescontoRealReg = 0
+        End If
+    End If
+   
+    '---------------------------- Boleto 07 ------------------ Nao Leva Desconto
+    If G_sTipoMen = "F" Then '-------- Tatilon Roberto ------
+        valorTitulo = cValorBase
+        G_sTipoMen = ""
+        cDescontoRealReg = 0
+    End If
+   
+    '---------------------------- Verifica se o Valor ta Inválido ---------------
+    If valorTitulo <= 0 Then
+        Set GerarBoletoMensalidade = New clsRetornoMetodo
+
+        With GerarBoletoMensalidade
+            .CodigoErro = 0
+            .Descricao = "Valor do título precisa ser maior que zero."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+
+        Exit Function
+    End If
+    '--------------------------- ::::::::: --------------------------------------
+    
+    Vencimento = CLASSEBOLETO.RetornarVencimentoParcela(Cpd, CodigoBoleto, AnoReferencia)
+      
+    nossoNumero = FG_GeraNossoNumero(CodigoBoleto, AnoReferencia, Cpd, eBoletoNormal)
+   
+'    If Gb_Graduacao Then
+'        If LiberGeralNTI_NossoNumer <> "" Then
+'           '--- Criando para todos os Tipos -- atualmente temos habilitado ou desabilitado apenas
+'        End If
+'    End If
+   
+    
+    nossoNumero = FG_GeraNossoNumero_400(nossoNumero, Cpd, eBoletoNormal, Vencimento, AnoReferencia, CodigoBoleto, CStr(ValorLig))
+        
+    '----------------------------------------------- Controlador ---
+    Gb_Graduacao = bBancoGraduacao
+  
+  #If Not Classes Then
+  
+  '  -----
+    If NOssoNumeronaTB09(nossoNumero) Then
+      Set BoletoSantander = New clsBoletoSantander
+      Set GerarBoletoMensalidade = BoletoSantander.ObterBoleto_T9_Est_Desc(nossoNumero, Estacao, cDescontoRealReg)
+      Exit Function
+    Else
+      If CDate(Vencimento) < CDate(FG_Data_Sistema) And Not bVisuzalizarBoleto Then
+          Set GerarBoletoMensalidade = New clsRetornoMetodo
+            With GerarBoletoMensalidade
+                .CodigoErro = 0
+                .Descricao = "Vencimento Inválido: " & Vencimento
+                .Retorno = False
+                Set .ValorRetorno = Nothing
+            End With
+         ' Call AlertaErro("Financeiro", "GerarBoletoMensalidade" & "Vencimento Inválido: " & Vencimento & " - CPD " & Cpd & "NossoNumero: " & NossoNumero)
+         Exit Function
+      End If
+    End If
+    '---------------------------------------------
+   #End If
+   
+    Call MensagensMensalidade_400(Cpd, CodigoBoleto, AnoReferencia, AlunoFinanceiro.Matricula, Vencimento, cDescontoRealReg)
+
+        
+    Set Sacado = New clsSacado
+    With Sacado
+        .Bairro = AlunoFinanceiro.Bairro
+        .CEP = AlunoFinanceiro.CEP
+        .CPFCnpj = AlunoFinanceiro.cpf
+        .Endereco = AlunoFinanceiro.Endereco
+        .NOME = AlunoFinanceiro.NOME
+        .UnidadeFederativa = AlunoFinanceiro.UnidadeFederativa
+        .Cidade = AlunoFinanceiro.Cidade
+    End With
+   
+    Set Sacador = New clsSacador
+    With Sacador
+        .NOME = AlunoFinanceiro.Contratante.NOME
+        .CPFCnpj = AlunoFinanceiro.Contratante.cpf
+    End With
+        
+    Select Case Banco
+    
+        Case "356"
+            Set BoletoReal = New clsBoletoReal
+            Set GerarBoletoMensalidade = BoletoReal.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                CodigoCedente, "9", Vencimento, valorTitulo, nossoNumero, "102", Mensagem(), Sacado, Sacador, FG_Retorna_Situacao_Boleta(Cpd, CodigoBoleto, AnoReferencia))
+            
+        Case "033"
+            Set BoletoSantander = New clsBoletoSantander '-- Tatilon 13.12.2016
+            
+            If bBoletoReg Then
+             
+              ' If Not bBoletoRemessa Then
+                    Set GerarBoletoMensalidade = BoletoSantander.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                        CodigoCedente, Estacao, "9", Vencimento, valorTitulo, nossoNumero, "101", Mensagem(), Sacado, Sacador, FG_Retorna_Situacao_Boleta(Cpd, CodigoBoleto, AnoReferencia), cDescontoRealReg)
+              ' Else '--- quando envia no arquivo remessa o numero 1 a linha muda para o padra 104
+                '--- 104 --- boleto registrado com 1 - eletronica com registro - a que envia para casa
+                    'Set GerarBoletoMensalidade = BoletoSantander.ObterBoleto(Banco, Agencia, NomeCedente, _
+                                                                   '    CodigoCedente, Estacao, "9", Vencimento, valorTitulo, NossoNumero, "104", Mensagem(), Sacado, Sacador, , cDescontoRealReg)
+              ' End If
+               
+            Else
+            
+                Set GerarBoletoMensalidade = BoletoSantander.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                    CodigoCedente, Estacao, "9", Vencimento, valorTitulo, nossoNumero, "102", Mensagem(), Sacado, Sacador, FG_Retorna_Situacao_Boleta(Cpd, CodigoBoleto, AnoReferencia), cDescontoRealReg)
+            End If
+            
+    End Select
+   
+    GerarBoletoMensalidade.ValorRetorno.CodigoBarrasCodificado = GerarCodigoBarraCodificado(GerarBoletoMensalidade.ValorRetorno.CodigoBarras)
+        
+    cDescontoRealReg = 0
+    ValorLig = 0
+    
+    Exit Function
+Tratamento:
+    
+    cDescontoRealReg = 0
+    ValorLig = 0
+
+    Set GerarBoletoMensalidade = New clsRetornoMetodo
+    With GerarBoletoMensalidade
+        .CodigoErro = Err.Number
+        .Descricao = Err.Description
+        .Retorno = False
+        Set .ValorRetorno = Nothing
+    End With
+    
+    #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+        Call Fechar_Conexao
+    #End If
+End Function
+
+#If Not Classes Then
+
+Public Function VerificarRegistrouT9Vencimento(ByVal Cpd As String, ByVal CodigoBoleto As String, _
+                                       ByVal AnoReferencia As String) As Boolean
+                                       
+                                       
+
+    Dim nossoNumero                             As String
+    Dim NossoNumero_Banco                       As String
+    
+    Dim CLASSEBOLETO                            As clsBoleto
+    Dim Vencimento                              As String
+    
+    
+    
+    
+    Dim sSql                                    As String
+    Dim rsConsulta                              As ADODB.Recordset
+    Dim cValor5p                                As Currency
+    Dim cGuardaLiquido                          As Currency
+    
+    Dim ValorLig                               As Currency
+    Dim cDadosMensagens                        As clsDadosBoletoMensagens
+    
+    
+On Error GoTo Tratamento
+
+
+    If Not Gb_Graduacao Then
+        'Necessario para buscar o anobol do aluno
+        sSql = ""
+        sSql = sSql & "SELECT   EX47ANOBOL "
+        sSql = sSql & "FROM     EX47BOLETT "
+        sSql = sSql & "WHERE    1=1 "
+        sSql = sSql & "         AND FK4737CPDALU = " & Cpd
+        sSql = sSql & "         AND EX47CODBOL   = '" & CodigoBoleto & "' "
+        
+        Set rsConsulta = G_CONEXAO_EXT.Execute(sSql)
+        
+        If rsConsulta.EOF Then
+            VerificarRegistrouT9Vencimento = False
+            Exit Function
+        Else
+            AnoReferencia = rsConsulta("EX47ANOBOL")
+        End If
+    End If
+    
+  Set CLASSEBOLETO = New clsBoleto
+    
+    CLASSEBOLETO.gbGraduacao = Gb_Graduacao
+    
+    
+    '--------------------------- ::::::::: --------------------------------------
+    
+    Vencimento = CLASSEBOLETO.RetornarVencimentoParcela(Cpd, CodigoBoleto, AnoReferencia)
+    nossoNumero = FG_GeraNossoNumero(CodigoBoleto, AnoReferencia, Cpd, eBoletoNormal)
+    nossoNumero = FG_GeraNossoNumero_400(nossoNumero, Cpd, eBoletoNormal, Vencimento, AnoReferencia, CodigoBoleto, CStr(ValorLig))
+        
+    '----------------------------------------------- Controlador ---
+    'Gb_Graduacao = bBancoGraduacao
+    If NOssoNumeronaTB09(nossoNumero) Then
+       VerificarRegistrouT9Vencimento = True
+    Else
+       VerificarRegistrouT9Vencimento = False
+    End If
+    '---------------------------------------------
+    Exit Function
+    
+Tratamento:
+    Call AlertaErro("Financeiro", "VerificarRegistrouT9Vencimento" & "CPD: " & Cpd & "NossoNumero: " & nossoNumero & " - " & Err.Description)
+    Err.Clear
+    Resume Next
+End Function
+#End If
+
+Private Sub Class_Initialize()
+    #If Classes Or Galileo Then
+        #If Euroam Then
+            GC_NOMEIES = "UNIEURO CENTRO UNIVERSITARIO"
+        #ElseIf Famaz Then
+            GC_NOMEIES = "FAMAZ FACULDADE METROPOLITANA DA AMAZONIA"
+        #ElseIf Galileo Then
+            GC_NOMEIES = "CENTRO DE ENSINO UNIFICADO DO PIAUI"
+        #ElseIf Cesup Then
+            GC_NOMEIES = "CENTRO DE ENSINO SUPERIOR DE PALMAS"
+        #Else
+            GC_NOMEIES = "CEUMA ASSOCIAÇÃO DE ENSINO SUPERIOR"
+        #End If
+    #End If
+End Sub
+
+Public Function GerarBoletoFinanciamento_400(ByVal Cpd As String, ByVal CodigoBoleto As String, _
+                                             ByVal AnoReferencia As String, ByVal TipoBol As Integer) As clsRetornoMetodo
+                                       
+    
+    Dim AlunoFinanceiro                         As clsAlunoFinanceiro
+    Dim RetornoMetodo                           As clsRetornoMetodo
+    
+    Dim ControleAluno                           As clsAlunoFinanceiroControle
+        
+    Dim CLASSEBOLETO                            As clsBoleto
+    
+    Dim nossoNumero                             As String
+    
+    Dim agencia                                 As String
+    Dim CodigoCedente                           As String
+    Dim ComplemententoConta                     As String
+    Dim Banco                                   As String
+    Dim Estacao                                 As String
+    
+    Dim Vencimento                              As String
+    Dim NomeCedente                             As String
+    
+    Dim BoletoSantander                         As clsBoletoSantander
+    Dim BoletoReal                              As clsBoletoReal
+    Dim Sacado                                  As clsSacado
+    Dim Sacador                                 As clsSacador
+    
+    Dim CodigoBarrasCodificado                  As String
+    
+    Dim valorTitulo                             As Currency
+    
+    Dim sSql                                    As String
+    Dim rsConsulta                              As ADODB.Recordset
+    
+On Error GoTo Tratamento
+
+    #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+        Call Abrir_Conexao(bBancoTeste)
+    #End If
+    
+    Gb_Graduacao = bBancoGraduacao
+    
+    
+    
+     If TipoBol = eBoletoCrediNegoc Then
+         'CHECA SE HÁ BOLETO DE NEGOCIAÇÃO
+         g_Sql = ""
+         g_Sql = g_Sql & "SELECT PFP7SITPAR AS SITBOL, "
+         g_Sql = g_Sql & "       PFP7DATVEN AS VENCIMENTO "
+         g_Sql = g_Sql & "FROM   PFP7PNEGFI "
+         g_Sql = g_Sql & "WHERE  1=1"
+         g_Sql = g_Sql & "   AND PFP7FORPAG = 15 "
+         g_Sql = g_Sql & "   AND FKP737CPDALU = " & Cpd & " "
+         'g_Sql = g_Sql & "   AND PFP7ANOPAR = " & sAnoBol & " "
+         g_Sql = g_Sql & "   AND PFP7CODPAR = " & CodigoBoleto
+     Else
+         g_Sql = ""
+         g_Sql = g_Sql & "SELECT PFP9SITBOL AS SITBOL, "
+         g_Sql = g_Sql & "       PFP9DATVEN AS VENCIMENTO "
+         g_Sql = g_Sql & "FROM   PFP9BOLFIN "
+         g_Sql = g_Sql & "WHERE  1=1"
+         g_Sql = g_Sql & "       AND FKP937CPDALU = " & Cpd & " "
+         'g_Sql = g_Sql & "       AND PFP9ANOBOL= " & sAnoBol & " "
+         g_Sql = g_Sql & "       AND PFP9CODBOL = '" & CodigoBoleto & "'"
+     End If
+     Call PG_ExecSQL("S", g_Sql, g_Res)
+
+     If g_Res!SITBOL <> "2" Then
+         'SÓ IMPRIME SE ESTIVER EM ABERTO OU SE QUITADA ATRAVES DE DEBITO
+         If g_Res!SITBOL = "1" Or g_Res!SITBOL = "4" Then
+             If Not FG_Seguranca(G_User, G_Sis, "PF06M", "PF90A", "", "") Then
+                 MsgBox "Boleta não está em aberto: Situação " & _
+                     g_Res!SITBOL, vbExclamation, App.Title
+             Else
+                 If MsgBox("Boleta não está em aberto: Situação " & g_Res!SITBOL & vbCrLf & _
+                    "Confirma impressão mesmo assim ?", _
+                     vbQuestion + vbYesNo + vbDefaultButton2, App.Title) = vbNo Then Exit Function
+             End If
+         Else
+             MsgBox "Boleta não está em aberto: Situação " & g_Res!SITBOL, vbExclamation, App.Title
+             Exit Function
+         End If
+     End If
+    
+    If Not Gb_Graduacao Then
+        'Necessario para buscar o anobol do aluno
+        sSql = ""
+        sSql = sSql & "SELECT   EX47ANOBOL "
+        sSql = sSql & "FROM     EX47BOLETT "
+        sSql = sSql & "WHERE    1=1 "
+        sSql = sSql & "         AND FK4737CPDALU = " & Cpd
+        sSql = sSql & "         AND EX47CODBOL   = '" & CodigoBoleto & "' "
+        
+        Set rsConsulta = G_CONEXAO_EXT.Execute(sSql)
+        
+        If rsConsulta.EOF Then
+            Set GerarBoletoFinanciamento_400 = New clsRetornoMetodo
+            With GerarBoletoFinanciamento_400
+                .CodigoErro = 0
+                .Descricao = "A ano da boleta não foi encontrado"
+                .Retorno = False
+                Set .ValorRetorno = Nothing
+            End With
+            
+            Exit Function
+        Else
+            AnoReferencia = rsConsulta("EX47ANOBOL")
+        End If
+    End If
+    
+    
+    Set ControleAluno = New clsAlunoFinanceiroControle
+    
+    ControleAluno.BancoGraduacao = bBancoGraduacao
+        
+    Set RetornoMetodo = ControleAluno.BuscarDadosAluno(Cpd)
+    
+    If Not RetornoMetodo.Retorno Then
+        Set GerarBoletoFinanciamento_400 = RetornoMetodo
+        
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+       
+    
+    Set AlunoFinanceiro = RetornoMetodo.ValorRetorno
+    
+    Set ControleAluno = Nothing
+    
+    'FIXEDME
+    'Criar modelo de conta bancario
+    'e indicar a conta ao curso
+    'Call PG_BuscarContaCompensacaoBoleto_Aluno(CPD, Agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente)
+       
+    If bBoletoReg Then
+       Call PG_BuscarContaCompensacaoBoletoRegistrado_Aluno(Cpd, agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente, "", Estacao)
+    Else
+       Call PG_BuscarContaCompensacaoBoleto_Aluno(Cpd, agencia, CodigoCedente, ComplemententoConta, Banco, NomeCedente)
+    End If
+    
+    If Trim$(agencia) = "" Or Trim$(CodigoCedente) = "" Or Trim$(ComplemententoConta) = "" Then
+        Set GerarBoletoFinanciamento_400 = New clsRetornoMetodo
+        With GerarBoletoFinanciamento_400
+            .CodigoErro = 0
+            .Descricao = "Faltam informações da conta."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+    
+    Set CLASSEBOLETO = New clsBoleto
+    
+    CLASSEBOLETO.gbGraduacao = bBancoGraduacao
+    
+    #If Euroam Then
+        cValorLiquido = FG_Valor_Boleta(CLng(Cpd), CInt(AnoReferencia), CodigoBoleto, FG_Data_Sistema("DD/MM/YYYY"))
+
+        Call CLASSEBOLETO.ValorBoleta(Cpd, CInt(AnoReferencia), CodigoBoleto, FG_Data_Sistema("DD/MM/YYYY"))
+
+        cValorLiquido = cValorBase - tDadosBoleto.ValorProuni - tDadosBoleto.ValorFies
+        '- tDadosBoleto.ValorDesconto
+    #Else
+        Call CLASSEBOLETO.ValorBoletaCREDICEUMA(Cpd, CInt(AnoReferencia), CodigoBoleto, FG_Data_Sistema("DD/MM/YYYY"))
+    #End If
+    
+    valorTitulo = cValorLiquido
+    
+    If valorTitulo <= 0 Then
+        Set GerarBoletoFinanciamento_400 = New clsRetornoMetodo
+        
+        With GerarBoletoFinanciamento_400
+            .CodigoErro = 0
+            .Descricao = "Valor do título precisa ser maior que zero."
+            .Retorno = False
+            Set .ValorRetorno = Nothing
+        End With
+        
+        #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+            Call Fechar_Conexao
+        #End If
+        
+        Exit Function
+    End If
+    
+    Vencimento = CLASSEBOLETO.RetornarVencimentoParcela(Cpd, CodigoBoleto, AnoReferencia)
+
+    nossoNumero = FG_GeraNossoNumero(CodigoBoleto, AnoReferencia, Cpd, eBoletoCrediCeuma)
+    
+    'Modificado
+    nossoNumero = FG_GeraNossoNumero_400(nossoNumero, Cpd, eBoletoCrediCeuma, Vencimento, AnoReferencia, CodigoBoleto, CStr(valorTitulo))
+        
+    'Call MensagensMensalidade(CPD, CodigoBoleto, AnoReferencia, AlunoFinanceiro.Matricula, Vencimento)
+
+'--------------------------------------------------------------------------------------------------------------------
+'Data: 18/07/2014
+'Autor: Nadson
+'Mudança para boleto SANTANDER par obter o texto para o Crediceuma
+    
+    sSql = ""
+    sSql = sSql & " SELECT  pf37CPDALU, pf37NOMEAL, pf37ENDERE, pf37BAIRRO, "
+    sSql = sSql & "         pf37CIDADE, pf37NUMCEP, pf37UNIFED, pf37NUMCPF, "
+    sSql = sSql & "         pf37MATALU, PF37CDTURM, PFA9ENDERE, PFA9BAIRRO, "
+    sSql = sSql & "         PFA9CIDADE, PFA9UNIFED, PFA9CEP, PFP9CODBOL AS MBCODBOL, "
+    sSql = sSql & "         PFP9DATVEN AS MBDATVEN, PFP9LOCPAG AS MBLOCPAG, PFP9DESCON AS MBDESCON, "
+    sSql = sSql & "         PFP9ANOBOL AS MBANOBOL, PFP9SITBOL AS MBSITBOL, PFP9DATPAG AS MBDATPAG, "
+    sSql = sSql & "         PFA9CPF, PFA9NOME, PFP6STATUS "
+    sSql = sSql & " FROM PF37ALUNOT (nolock), PFP9BOLFIN (nolock), PFA9CONALT (nolock) , PFP6CTRFIN (NOLOCK) "
+    sSql = sSql & " WHERE PF37CPDALU   = " & Cpd
+    sSql = sSql & "     AND FKP937CPDALU = PF37CPDALU "
+    'Não é utilizado ANOREF no CREDICEUMA
+    'ssql = ssql & "     AND PFP9ANOBOL   = " & AnoReferencia
+    sSql = sSql & "     AND PFP9CODBOL   = '" & CodigoBoleto & "' "
+    sSql = sSql & "     AND FK37A9CPF   *= PFA9CPF "
+    sSql = sSql & "     AND FKP637CPDALU = FKP937CPDALU "
+
+    Set rsConsulta = G_CONEXAO_ADO.Execute(sSql)
+
+    If rsConsulta.EOF Then
+        MsgBox "Não existe boleta para impressão.", vbInformation + vbOKOnly, GC_MENSA_SISTEMA
+        Exit Function
+    End If
+
+    'Para alunos com contrato cancelado ter um texto diferenciado
+    'no boleto a pagar do financiamento em relação ao aluno com contrato
+    'ativo e que iniciará pagar o financiamento.
+
+    Call PG_Msg_Boleta_Crediceuma(Cpd, rsConsulta!PF37MATALU, rsConsulta!MBanobol, rsConsulta!MBcodbol, _
+                                  rsConsulta!MBDATVEN, rsConsulta!MBSITBOL, "R", rsConsulta!PFP6STATUS)
+
+'Colocando o novo padrão de recebimento das mensagens para o boleto SANTANDER
+        Mensagem(1) = G_MsgBol(1)
+        Mensagem(2) = G_MsgBol(2)
+        Mensagem(3) = G_MsgBol(3)
+        Mensagem(4) = G_MsgBol(4)
+        Mensagem(5) = G_MsgBol(5)
+        Mensagem(6) = G_MsgBol(6)
+        Mensagem(7) = G_MsgBol(7)
+        Mensagem(8) = G_MsgBol(8)
+        Mensagem(9) = G_MsgBol(9)
+'--------------------------------------------------------------------------------------------------------------------
+
+    Set Sacado = New clsSacado
+    
+    With Sacado
+        .Bairro = AlunoFinanceiro.Bairro
+        .CEP = AlunoFinanceiro.CEP
+        .CPFCnpj = AlunoFinanceiro.cpf
+        .Endereco = AlunoFinanceiro.Endereco
+        .NOME = AlunoFinanceiro.NOME
+        .UnidadeFederativa = AlunoFinanceiro.UnidadeFederativa
+        .Cidade = AlunoFinanceiro.Cidade
+    End With
+    
+    Set Sacador = New clsSacador
+    
+    With Sacador
+        .NOME = AlunoFinanceiro.Contratante.NOME
+        .CPFCnpj = AlunoFinanceiro.Contratante.cpf
+    End With
+        
+    Select Case Banco
+        Case "356"
+            Set BoletoReal = New clsBoletoReal
+            Set GerarBoletoFinanciamento_400 = BoletoReal.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                CodigoCedente, "9", Vencimento, valorTitulo, nossoNumero, "102", Mensagem(), Sacado, Sacador, FG_Retorna_Situacao_Boleta(Cpd, CodigoBoleto, AnoReferencia))
+            
+        Case "033"
+            Set BoletoSantander = New clsBoletoSantander
+            Set GerarBoletoFinanciamento_400 = BoletoSantander.ObterBoleto(Banco, agencia, NomeCedente, _
+                                                                     CodigoCedente, Estacao, "9", Vencimento, valorTitulo, nossoNumero, "102", Mensagem(), Sacado, Sacador, g_Res!SITBOL)
+    End Select
+    
+    GerarBoletoFinanciamento_400.ValorRetorno.CodigoBarrasCodificado = GerarCodigoBarraCodificado(GerarBoletoFinanciamento_400.ValorRetorno.CodigoBarras)
+    
+    Exit Function
+Tratamento:
+    Set GerarBoletoFinanciamento_400 = New clsRetornoMetodo
+    With GerarBoletoFinanciamento_400
+        .CodigoErro = Err.Number
+        .Descricao = Err.Description
+        .Retorno = False
+        Set .ValorRetorno = Nothing
+    End With
+    
+    #If Not Pedagogico And Not VEST And Not Caixa And Not SPF_FINANCA Then
+        Call Fechar_Conexao
+    #End If
+
+End Function
+Public Function PreencheDadosdaTB09(ByVal sNossoNumero, ByRef BoletoSantander As clsBoletoSantander) As Boolean
+
+
+
+
+End Function
+Public Function NOssoNumeronaTB09(ByVal sNossoNumero) As Boolean
+Dim sSql As String
+Dim rsBuscaNossNumero As ADODB.Recordset
+
+'#If Classes Then
+'   G_CONEXAO_TRANSABOL.Open
+'End If
+
+On Error GoTo TrataNossoNumeronaTB09
+
+   sSql = vbNullString
+   sSql = sSql & " SELECT * FROM TB09INFOBOLETO "
+   sSql = sSql & " WHERE CONVERT(INT,TB09NOSSONUMERO) = " & sNossoNumero
+   sSql = sSql & " AND TB09REGREMESSA <> 'C' "
+   
+   Call PG_ExecSQL("S", sSql, rsBuscaNossNumero, , , "TB")
+   
+   
+   'Set rsBuscaNossNumero = G_CONEXAO_TRANSABOL.Execute(sSql)
+   
+   If Not rsBuscaNossNumero.EOF Then
+     NOssoNumeronaTB09 = True
+   Else
+     NOssoNumeronaTB09 = False
+   End If
+   
+
+  Exit Function
+  
+  
+TrataNossoNumeronaTB09:
+  Call AlertaErro("Financeiro", "NOssoNumeronaTB09" & " - " & sNossoNumero & " - " & Err.Description)
+
+End Function
+
+
+''#If Classes Then
+''================================================================= GRADUAÇÃO ================================
+'Public Function Dll_Test_AlunosGrad(ByVal AnoSemestreTest As String) As tDadosAlunoGradb
+''Public Function Dll_Test_AlunosGrad(ByVal AnoSemestreTest As String) As DadosBoleto
+'    Dim Vencimento                              As String
+'    Dim valorTitulo                             As Currency
+'    Dim NossoNumero                             As String
+'    Dim BoletoSantander                         As clsBoletoSantander
+'    Dim BoletoReal                              As clsBoletoReal
+'    Dim CodigoBarrasCodificado                  As String
+'    Dim sSql                                    As String
+'    Dim rsConsulta                              As ADODB.Recordset
+'    Dim sPrefixoBanco                           As String
+'    Dim Estacao                                 As String
+'    Dim Dados(10)                               As tDadosAlunoGrad
+'
+'
+'    With Dados(1)
+'         .CPD = "34212"
+'         .CodBol = "04"
+'         .Anobol = "20181"
+'    End With
+'
+'     With Dados(2)
+'         .CPD = "34212"
+'         .CodBol = "04"
+'         .Anobol = "20181"
+'    End With
+'
+'     With Dados(3)
+'         .CPD = "34212"
+'         .CodBol = "04"
+'         .Anobol = "20181"
+'    End With
+'
+'    'MultiDaDos = Dados
+'
+'
+'On Error GoTo Tratamento
+'
+'
+'    sSql = ""
+'    sSql = sSql & "   SELECT TOP 10 FK4737CPDALU AS CPD, "
+'    sSql = sSql & "   PF47ANOBOL AS ANOBOL, "
+'    sSql = sSql & "   PF47CODBOL AS CODBOL , "
+'    sSql = sSql & "   FROM  PF47BOLETT WHERE  "
+'    sSql = sSql & "         PF47ANOBOL = 20181 "
+'
+'    Set rsConsulta = G_CONEXAO_ADO.Execute(sSql)
+'    If rsConsulta.EOF Then
+'
+'
+'
+'    End If
+'
+'
+'    Exit Function
+'
+'
+'Tratamento:
+'
+'End Function
+''================================================================= EXTENSÃO ================================
+
+'Public Function Dll_Test_AlunosExt(ByVal AnoSemestreTest As String) As tDadosAlunoExten
+'
+'    Dim Vencimento                              As String
+'    Dim valorTitulo                             As Currency
+'    Dim NossoNumero                             As String
+'
+'    Dim BoletoSantander                         As clsBoletoSantander
+'    Dim BoletoReal                              As clsBoletoReal
+'
+'    Dim CodigoBarrasCodificado                  As String
+'
+'    Dim sSql                                    As String
+'
+'    Dim rsConsulta                              As ADODB.Recordset
+'
+'    Dim sPrefixoBanco                           As String
+'
+'    Dim Estacao                                 As String
+'
+'
+'On Error GoTo Tratamento
+'
+'
+'    sSql = ""
+'    sSql = sSql & "   SELECT TOP 10 FK4737CPDALU AS CPD, "
+'    sSql = sSql & "   PF47ANOBOL AS ANOBOL, "
+'    sSql = sSql & "   PF47CODBOL AS CODBOL , "
+'    sSql = sSql & "   FROM  PF47BOLETT WHERE  "
+'    sSql = sSql & "         PF47ANOBOL = 20181 "
+'
+'    Set rsConsulta = G_CONEXAO_EXT.Execute(sSql)
+'
+'    If rsConsulta.EOF Then
+'
+'
+'
+'
+'    End If
+'
+' Exit Function
+'
+'Tratamento:
+'
+'
+' End Function
+ 
+
+
+
+'#End If
+
+
+
+
+
+
+
+
+
